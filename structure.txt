@@ -1,6 +1,6 @@
 --topModule
 ----pixelClk 				  ( 100% - Tested )
-----kbdController 
+----kbdController 			  [1]
 --------kbdHandler  		  ( 100% - Tested )
 --------ps2Decode   		  ( 90% - Test Pending )
 ----colorDecode	    		  ( 90% - Test Pending )
@@ -11,4 +11,14 @@
 ----charRom 				  ( 90% - Test Pending [1] )
 
 
-- [1] -- Clear Character Buffer one Reset?
+##### Notes #################################################################################
+
+- [1] -- Clear scancode buffer on next clock or use it once at top module ( e.g colorDecode )
+		 and ignore repeats of non user inputs?
+
+- [2] -- Clear Character Buffer one Reset !?
+	     -- Maybe not needed cause we clear ps2Decode buffers!
+	  -- Check Rom response time in clock cycles ( possibly just 2 )
+	  	 -- So request Rom's data X cycles earlier!
+	  -- Input address seperate bits for col and row selection
+	  	-- Constuct under another module to split bits per line of pixelCnt

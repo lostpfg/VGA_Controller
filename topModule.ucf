@@ -1,5 +1,10 @@
+# -- Global Interface --
 net boardClk  loc  = t9;
-net reset 	  loc  = p12;
+net reset 	  loc  = h4;
+# -- PS/2 Interface ----
+net ps2clk 	  loc  = b16;
+net ps2data	  loc  = e13;
+# -- VGA Interface -----
 # -- Blue Color --------
 net vgaRGB<8> loc  = d5;
 net vgaRGB<7> loc  = e7;
