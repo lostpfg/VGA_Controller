@@ -31,7 +31,7 @@ module  UpDownCounter3bit  ( clock, reset, enable, outNum ) ;
         end 
       else if ( enable )
         begin
-          tmp = ( ~upDown ) ? (tmp + 1'b1) : (tmp - 1'b1);
+          tmp = ( ~upDown ) ? ( tmp + 1'b1 ) : ( tmp - 1'b1 );
           /*
           if ( ~upDown ) 
             tmp = tmp + 1'b1; 

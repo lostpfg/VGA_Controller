@@ -8,7 +8,7 @@
 --------vgaHandler 			  ( 100% - Tested )
 --------charController
 ------------UpDownCounter3bit ( 90% - Test Pending )
-----charRom 				  ( 90% - Test Pending [1] )
+----charRom 				  ( 90% - Test Pending [2] )
 
 
 ##### Notes #################################################################################
@@ -21,4 +21,4 @@
 	  -- Check Rom response time in clock cycles ( possibly just 2 )
 	  	 -- So request Rom's data X cycles earlier!
 	  -- Input address seperate bits for col and row selection
-	  	-- Constuct under another module to split bits per line of pixelCnt
+	  	-- Constuct under a sub/top-module to split bits per line of pixelCnt
