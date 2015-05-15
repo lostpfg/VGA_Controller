@@ -26,8 +26,10 @@ module  charController	(	clock,	reset, pixelCnt, lineCnt, rgbIn, vgaRGB );
 	reg 		     [2:0]    vgaG;
 	reg 		     [2:0]	  vgaB;
 
-	reg 		     [2:0]	  charRow;	/* Counter for lines in active Region */
-	reg 		     [3:0]	  charCol;	/* Counter for pixels in active Region */
+	reg 		     [2:0]	  rowCnt;	/* Counter for lines in active Region */
+	reg 		     [3:0]	  colCnt;	/* Counter for pixels in active Region */
+  reg                   rowEn;  /* Counter for lines in active Region */
+  reg                   colEn;  /* Counter for pixels in active Region */
 
 	output	reg  [8:0]	  vgaRGB;
 
@@ -41,20 +43,38 @@ module  charController	(	clock,	reset, pixelCnt, lineCnt, rgbIn, vgaRGB );
 
   always @ ( lineCnt or posedge reset ) begin
       if ( reset )
-          charRow <= 3'd0;
-      else if (  pixelCnt == ( HAE + HAL ) - 1 ) /* Reached the last line of Active Region, so reset the counter */
-          charRow <= 3'd0;
-      else if (  pixelCnt >= HAE - 1 ) /* Did not reach the last line, so increase the counter */
-          charRow <=  charRow + 1;
+        begin
+          rowCnt  <= 3'd0;
+          rowEn   <= 1'b0;
+        end
+      else if ( lineCnt == ( HAE + HAL ) - 1 ) /* Reached the last line of Active Region, so reset the counter */
+        begin
+          rowCnt  <= 3'd0;
+          rowEn   <= ~rowEn;
+        end
+      else if ( lineCnt >= HAE - 1 ) /* Did not reach the last line, so increase the counter */
+        begin
+          rowCnt  <=  rowCnt + 1;
+          rowEn   <=  ~rowEn;
+        end
   end
 
   always @ ( pixelCnt or posedge reset ) begin
       if ( reset )
-          charCol <= 2'd0;
-      else if (  pixelCnt == ( VAE + VAL ) - 1 ) /* Reached the last pixel of Active Region, so reset the counter */
-          charCol <= 2'd0;
-      else if (  pixelCnt >= VAE - 1 )/* Did not reach the pixel line, so increase the counter */
-          charCol <=  charCol + 1;
+        begin
+          colCnt  <= 2'd0;
+          colEn   <= 1'b0;
+        end
+      else if ( pixelCnt == ( VAE + VAL ) - 1 ) /* Reached the last pixel of Active Region, so reset the counter */
+        begin
+          colCnt  <= 2'd0;
+          colEn   <= ~colEn;
+        end
+      else if ( pixelCnt >= VAE - 1 )/* Did not reach the pixel line, so increase the counter */
+        begin
+          colCnt  <=  colCnt + 1;
+          colEn   <= ~colEn;
+        end
   end
 
   /* Color Edit Mode */
@@ -74,7 +94,7 @@ module  charController	(	clock,	reset, pixelCnt, lineCnt, rgbIn, vgaRGB );
   always @ ( posedge clock or posedge reset ) begin
       if ( reset )
         vgaRGB	<=  9'd0;
-      else if ( /* Inside Active Region */ )
+      else if ( colEn && rowEn ) /* Inside Active Region */
   			vgaRGB	<= { vgaB, vgaG, vgaR };
       else 
         vgaRGB	<=  9'd0; 	/* Outside Display Region everything is black */
