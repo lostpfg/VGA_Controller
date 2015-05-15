@@ -1,0 +1,17 @@
+net boardClk  loc  = t9;
+net reset 	  loc  = p12;
+# -- Blue Color --------
+net vgaRGB<8> loc  = d5;
+net vgaRGB<7> loc  = e7;
+net vgaRGB<6> loc  = c9;
+# -- Gren Color --------
+net vgaRGB<5> loc  = c3;
+net vgaRGB<4> loc  = a5;
+net vgaRGB<3> loc  = a8;
+# -- Red Color ---------
+net vgaRGB<2> loc  = b1;
+net vgaRGB<1> loc  = d6;
+net vgaRGB<0> loc  = c8;
+# -- Syncing -----------
+net vgaHsync  loc  = b7;
+net vgaVsync  loc  = d8;
