@@ -1,7 +1,10 @@
 module charRom ( pixelClk, inAddress, outData );
+
 	input				pixelClk;
 	input 		[5:0]	inAddress;
+	
 	output reg 	[7:0] 	outData;
+
 	always @ ( posedge pixelClk ) begin
 		case ( inCode )
 

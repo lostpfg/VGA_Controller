@@ -36,7 +36,7 @@ module kbdHandler ( reset, clock, ps2clk, ps2data, scancode );
   */
 
   always @ ( posedge clock or posedge reset )
-    if (reset) 
+    if ( reset ) 
       begin
         cnt      <= 4'd0;
         scancode <= 8'd0;

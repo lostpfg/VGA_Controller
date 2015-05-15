@@ -2,7 +2,7 @@
 *                                                                       *
 *                      __________________                               *
 *                                                                       *
-*   clock  ------> |                   | -------> hSync              *
+*   clock     ------> |                   | -------> hSync              *
 *   reset     ------> |                   | --/10--> pixelCnt           *
 *                     |    vgaHandler     | -------> vSync              *
 *                     |                   | --/09--> lineCnt            *

@@ -1,11 +1,14 @@
 --topModule
-----pixelClk 				  ( 100% )
+----pixelClk 				  ( 100% - Tested )
 ----kbdController 
---------kbdHandler  		  ( 100% )
+--------kbdHandler  		  ( 100% - Tested )
 --------ps2Decode   		  ( 90% - Test Pending )
 ----colorDecode	    		  ( 90% - Test Pending )
 ----dispController
---------vgaHandler 			  ( 100% )
+--------vgaHandler 			  ( 100% - Tested )
 --------charController
 ------------UpDownCounter3bit ( 90% - Test Pending )
-----charRom 				  ( 90% - Test Pending )
+----charRom 				  ( 90% - Test Pending [1] )
+
+
+- [1] -- Clear Character Buffer one Reset?

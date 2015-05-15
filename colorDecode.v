@@ -22,9 +22,9 @@ module colorDecode ( reset, inCode, outColor );
 	        outColor  <= 3'd0;
 	    else
 					case ( inCode[1:0] ) /* Check only 2 least significant bits */
-						2'd1 : outColor <= 3'b001;
-						2'd2 : outColor <= 3'b010;
-						2'd3 : outColor <= 3'b100;
+						2'd1 : outColor <= 3'd1;
+						2'd2 : outColor <= 3'd2;
+						2'd3 : outColor <= 3'd3;
 					endcase
 	end
 
