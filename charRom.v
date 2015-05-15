@@ -2,7 +2,7 @@ module charRom ( pixelClk, inAddress, outData );
 
 	input				pixelClk;
 	input 		[5:0]	inAddress;
-	
+
 	output reg 	[7:0] 	outData;
 
 	always @ ( posedge pixelClk ) begin
@@ -67,11 +67,11 @@ module charRom ( pixelClk, inAddress, outData );
 
 			/* 00h: 4 */
 
-			6'h30: outData <= 8'hC6; // ##   ## 
-			6'h31: outData <= 8'hC6; // ##   ##  
-			6'h32: outData <= 8'hC6; // ##   ##  
-			6'h33: outData <= 8'hC6; // ##   ##  
-			6'h34: outData <= 8'hC6; // ##   ##  
+			6'h30: outData <= 8'h17; //    #### 
+			6'h31: outData <= 8'h37; //   #####  
+			6'h32: outData <= 8'h76; //  ### ##  
+			6'h33: outData <= 8'hE6; // ###  ##  
+			6'h34: outData <= 8'hE6; // ###  ##  
 			6'h35: outData <= 8'hC6; // ##   ##  
 			6'h36: outData <= 8'hC6; // ##   ##  
 			6'h37: outData <= 8'hFF; // ########
@@ -81,8 +81,8 @@ module charRom ( pixelClk, inAddress, outData );
 			6'h3B: outData <= 8'h06; //      ##  
 			6'h3C: outData <= 8'h06; //      ##  
 			6'h3D: outData <= 8'h06; //      ##  
-			6'h3E: outData <= 8'h06; //      ## 
-			6'h3F: outData <= 8'h06; //      ## 
+			6'h3E: outData <= 8'h0F; //     #### 
+			6'h3F: outData <= 8'h0F; //     #### 
 
 
 		endcase                              
