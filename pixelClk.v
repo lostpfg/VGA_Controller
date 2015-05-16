@@ -20,7 +20,7 @@ module pixelClk ( inClock, reset, outClock );
   
   assign outClock = ( cnt == 2'd3 ); /* We count at range 0-3 */
 
-  always @( posedge inClock or posedge reset )
+  always @ ( posedge inClock or posedge reset )
     if ( reset ) 
 			cnt <= 0; /* Clear Counter */
     else 

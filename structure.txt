@@ -2,13 +2,13 @@
 ----pixelClk 				  ( 100% - Tested )
 ----kbdController 			  [1]
 --------kbdHandler  		  ( 100% - Tested )
---------ps2Decode   		  ( 90% - Test Pending )
-----colorDecode	    		  ( 90% - Test Pending )
+--------ps2Decode   		  ( 90% -  More Tests Pending )
+----colorDecode	    		  ( 90% -  More Tests Pending )
 ----dispController
 --------vgaHandler 			  ( 100% - Tested )
---------charController
-------------UpDownCounter3bit ( 90% - Test Pending )
-----charRom 				  ( 90% - Test Pending [2] )
+--------charController		  ( 100% - Tested )
+------------UpDownCounter3bit ( 100% - Tested )
+----charRom 				  ( 80% - Test Pending [2] )
 
 
 ##### Notes #################################################################################

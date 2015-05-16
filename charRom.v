@@ -1,11 +1,23 @@
-module charRom ( pixelClk, inAddress, outData );
+/*----- Module Overview --------------------------------------*
+*																															*
+*             	         _______________                      *
+*																															*
+*												|					  		|											* 
+*  clock      ------->	|								| --/08--> outData    *
+*  inAddress  --/06-->	|    charRom    |										  * 
+*												|								|											* 
+*            	           _______________                      *
+*																															*
+*-------------------------------------------------------------*/
 
-	input				pixelClk;
+module charRom ( clock, inAddress, outData );
+
+	input						clock;
 	input 		[5:0]	inAddress;
 
 	output reg 	[7:0] 	outData;
 
-	always @ ( posedge pixelClk ) begin
+	always @ ( posedge clock ) begin
 		case ( inCode )
 
 			/* 00h: 1 */
