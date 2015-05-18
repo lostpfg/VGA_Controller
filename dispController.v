@@ -3,7 +3,7 @@
 *                      _____________________                      *
 *																																	*
 *											|											|											* 
-*  pixelClk ------->	|											| --/09--> vgaRGB     *
+*  clock ------->	|											| --/09--> vgaRGB     *
 *  reset    ------->	|   dispController   	| -------> vgaVsync   *
 *	 rgbIn  	--/03--> 	|											| -------> vgaHsync   *
 *											|											|											* 
@@ -11,9 +11,9 @@
 *																																	*
 *-----------------------------------------------------------------*/
 
-module  dispController	(	pixelClk,	reset, rgbIn, vgaRGB, vgaHsync, vgaVsync );
+module  dispController	(	clock,	reset, rgbIn, vgaRGB, vgaHsync, vgaVsync );
 
-input								pixelClk;
+input								clock;
 input								reset;
 input 			[2:0]  	rgbIn;
 
@@ -23,15 +23,20 @@ wire								compBlank;
 wire								hSync;
 wire								vSync;
 wire 				[8:0]		charRGB;
+wire								rowEn;
+wire								colEn;
+wire								outBit;
 
 output							vgaVsync;
 output							vgaHsync;
 output	reg	[8:0]		vgaRGB;
 
-vgaHandler 			vgaPr 	( pixelClk, reset, hSync, pixelCnt, vSync, lineCnt, compBlank  );
-charController	charPr	(	pixelClk,	reset, pixelCnt, lineCnt, charRGB	);
+vgaHandler 			dc0  ( clock, reset, hSync, pixelCnt, vSync, lineCnt, compBlank  );
+charController	dc1	 ( clock, reset, pixelCnt, lineCnt, rgbIn, outBit, colEn, rowEn, charRGB	);
+charParsser			dc2	 ( clock, reset, colEn, rowEn, outBit ) ; 
 
-always @ ( posedge pixelClk or posedge reset ) begin
+
+always @ ( posedge clock or posedge reset ) begin
 	if ( reset ) 
 		begin 
 			vgaRGB	<= 9'd0; /* Clear Local Buffer */
