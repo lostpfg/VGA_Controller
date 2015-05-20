@@ -15,19 +15,28 @@ module ps2Decode ( reset, ps2InCode, ps2OutCode  );
 	input   						reset;
 	input 			[7:0] 	ps2InCode;
 
-	output reg	[5:0] 	ps2OutCode;
+	output reg	[7:0] 	ps2OutCode;
 
-	always @ ( ps2InCode or posedge reset ) begin
+	always @ ( * ) begin
 	    if ( reset )
-	        ps2OutCode  <= 6'h0C;
+	      ps2OutCode  <= 4'hE;
 	    else
-					ps2OutCode  <=  ( ps2InCode == 8'h16 ) ? 6'h00 :  				/* 1 */
-             						  ( ps2InCode == 8'h1E ) ? 6'h10 :  				/* 2 */
-              					  ( ps2InCode == 8'h26 ) ? 6'h20 :  				/* 3 */
-              					  ( ps2InCode == 8'h25 ) ? 6'h30 :  				/* 4 */
-              					  ( ps2InCode == 8'h2D ) ? 6'h01 :  				/* R */
-              					  ( ps2InCode == 8'h34 ) ? 6'h02 :  				/* G */
-              					  ( ps2InCode == 8'h32 ) ? 6'h03 : 6'h0C;   /* B / DC */
+				ps2OutCode  <= ( ps2InCode == 8'h16 ) ? 4'h0 : 					/* 1 */
+											 ( ps2InCode == 8'h1E ) ? 4'h1 : 					/* 2 */
+											 ( ps2InCode == 8'h26 ) ? 4'h2 : 					/* 3 */
+											 ( ps2InCode == 8'h25 ) ? 4'h3 : 					/* 4 */
+											 ( ps2InCode == 8'h2D ) ? 4'h4 : 					/* R */
+											 ( ps2InCode == 8'h34 ) ? 4'h5 : 					/* G */
+											 ( ps2InCode == 8'h32 ) ? 4'h6 : 					/* B */
+											 ( ps2InCode == 8'h32 ) ? 4'h7 : 					/* Up */
+											 ( ps2InCode == 8'h32 ) ? 4'h8 : 					/* Down */
+											 ( ps2InCode == 8'h32 ) ? 4'h9 : 					/* Left */
+											 ( ps2InCode == 8'h32 ) ? 4'hA : 					/* Right */
+											 ( ps2InCode == 8'h79 ) ? 4'hB : 					/* + */
+											 ( ps2InCode == 8'h7B ) ? 4'hC : 					/* - */
+											 ( ps2InCode == 8'h6B ) ? 4'hD : 4'hE;		/* f / DC */
+								 
+								 
 	end
 
 endmodule
