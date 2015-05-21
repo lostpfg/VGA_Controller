@@ -11,18 +11,17 @@
 *                                                                         *
 *-------------------------------------------------------------------------*/
 
-module  UpDownCounter3bit  ( clock, reset, enable, outNum ) ; 
+module  UpDownCounter3bit  ( reset, enable, outNum ) ; 
 
-  input          clock;
-  input          reset 
+  input          reset;
   input          enable;
 
   output  [2:0]  outNum; 
 
   reg     [2:0]  tmp; 
-  reg     [2:0]  upDownFlag;
+  reg            upDownFlag;
 
-  always @ ( posedge clock or posedge reset ) begin 
+  always @ ( posedge enable or posedge reset ) begin 
       if ( reset ) 
         begin
           tmp        <= 3'd0;
@@ -30,11 +29,11 @@ module  UpDownCounter3bit  ( clock, reset, enable, outNum ) ;
         end 
       else if ( enable )
         begin
-          tmp = ( ~upDownFlag ) ? ( tmp + 1'b1 ) : ( tmp - 1'b1 );
-          if ( tmp == 3'd0 )
-            upDownFlag = ~upDownFlag;
-          else if ( tmp == 3'd7 )
-            upDownFlag = ~upDownFlag;
+          tmp <= ( ~upDownFlag ) ? ( tmp + 1 ) : ( tmp - 1 );
+          if ( tmp == 3'd6 )
+            upDownFlag <= 1'b1;
+          else if ( tmp == 3'd1 )
+            upDownFlag <= 1'b0;
         end
   end 
 

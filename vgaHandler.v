@@ -15,7 +15,7 @@
 *                                                                       *
 *-----------------------------------------------------------------------*/
 
-module vgaHandler ( clock, reset, hSync, pixelCnt, vSync, lineCnt, compBlank  );
+module vgaHandler ( clock, reset, hSync, vSync, pixelCnt, lineCnt, compBlank );
 
     input               clock;           /* Pixel Clock */
     input               reset;              /* Reset */

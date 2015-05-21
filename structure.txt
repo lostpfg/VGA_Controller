@@ -1,23 +1,23 @@
---topModule
-----pixelClk 				  ( 100% - Tested )
-----kbdController 			  [1]
---------kbdHandler  		  ( 100% - Tested )
---------ps2Decode   		  ( 90% -  More Tests Pending )
-----inputDecode	    	  	  ( 90% -  More Tests Pending )
-----dispController
---------vgaHandler 			  ( 100% - Tested )
---------charController		  ( 100% - Tested )
-------------UpDownCounter3bit ( 100% - Tested )
-----charRom 				  ( 80% - Test Pending [2] )
-
-
-##### Notes #################################################################################
-
-- [1] -- Clear scancode buffer on next clock or use it once at top module ( e.g colorDecode )
-		 and ignore repeats of non user inputs?
-
-- [2]
-	  -- Check Rom response time in clock cycles ( possibly just 2 )
-	  	 -- So request Rom's data X cycles earlier!
-	  -- Input address seperate bits for col and row selection
-	  	-- Constuct under a sub/top-module to split bits per line of pixelCnt
++--- topModule
+    |
+    +--- pixelClk                   ( 100% - Tested )
+    |
+    +--- kbdController          
+    |   |
+    |   +--- kbdHandler             ( 100% - Tested )
+    |   |
+    |   +--- ps2Decode              ( 90% -  More Tests Pending )
+    |
+    +--- inputDecode                ( 90% -  More Tests Pending )
+    |
+    +--- dispController                   
+    |   |
+    |   +--- vgaHandler             ( 100% - Tested )
+    |   |
+    |   +--- charController         ( 100% - Tested )       
+    |
+    +--- charRom                    ( 100% - Tested )
+    |
+    +--- colorController            ( 100% - Tested )
+        |
+        +--- UpDownCounter3bit      ( 100% - Tested )

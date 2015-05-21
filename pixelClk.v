@@ -1,29 +1,29 @@
 /*----- Module Overview ---------------------------------------*
-*																													   	 *
-*                      _______________                       	 *
-*																  													 	 *
-*											|								|											 	 * 
-*  inClock  ------->	|   				  	|											 	 * 
-*	 reset  	------->  |		pixelClk		|  ------->  ps2OutCode  *
-*											|								|	  										 * 
-*                      _______________ 												 *
-*																		  		  									 *
+*                                                              *
+*                      _______________                         *
+*                                                              *
+*                     |               |                        * 
+*  clock  ------->    |               |                        * 
+*  reset    ------->  |   pixelClk    |  ------->  clockMod4   *
+*                     |               |                        * 
+*                      _______________                         *
+*                                                              *
 *--------------------------------------------------------------*/
-module pixelClk ( inClock, reset, outClock );
+module pixelClk ( clock, reset, clockMod4 );
 
-  input 					inClock;
-  input 					reset;
+  input           clock;
+  input           reset;
 
-  reg 		[1:0] 	cnt; /* 1 bit register */
+  reg     [1:0]   cnt; /* 2 bit register */
 
-  output 					outClock;
+  output          clockMod4;
   
-  assign outClock = ( cnt == 2'd3 ); /* We count at range 0-3 */
+  assign clockMod4 = ( cnt == 2'd3 ); /* We count at range 0-3 */
 
-  always @ ( posedge inClock or posedge reset )
+  always @ ( posedge clock or posedge reset )
     if ( reset ) 
-			cnt <= 0; /* Clear Counter */
+      cnt <= 0; /* Clear Counter */
     else 
-			cnt <= cnt + 1;
+      cnt <= cnt + 1;
 
 endmodule

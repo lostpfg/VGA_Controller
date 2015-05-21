@@ -1,6 +1,6 @@
 # -- Global Interface --
 net boardClk  loc  = t9;
-net reset 	  loc  = h4;
+net reset 	  loc  = p12;
 # -- PS/2 Interface ----
 net ps2clk 	  loc  = b16;
 net ps2data	  loc  = e13;
