@@ -17,17 +17,19 @@
 
 module vgaHandler ( clock, reset, hSync, pixelCnt, vSync, lineCnt, compBlank  );
 
-    input               clock;           /* Pixel Clock */
-    input               reset;              /* Reset */
+    input               clock;
+    input               reset;
+
+    reg                 hBlank;             /* Horizontal blanking signal */
+    reg                 vBlank;             /* Vertical blanking signal */
 
     output reg          hSync;              /* Horizontal Syncing Signal */
     output reg          vSync;              /* Vertical Syncing Signal */
-    output reg  [9:0]   pixelCnt;           /* Counter for pixels in a line */
-    output reg  [8:0]   lineCnt;            /* Counter of  lines */
-    output              compBlank;          /* Counter of  lines */
+    output reg  [9:0]   pixelCnt;           /* Counter of pixels in a line */
+    output reg  [8:0]   lineCnt;            /* Counter of lines in a frame */
+    output              compBlank;          /* Tracks Composite Blanking Signal */
     
-    reg                 hBlank;             /* Composite blanking signal */
-    reg                 vBlank;             /* Composite blanking signal */
+
 
     /*----- Timing Table of Horizontal and Vertical Signals ---------------*
     *   Both the Horizontal and Vertical syncing signals capture the same  *

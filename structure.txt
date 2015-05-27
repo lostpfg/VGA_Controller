@@ -1,27 +1,27 @@
 +--- topModule
     |
-    +--- pixelClk                   ( 100% - Tested )
+    +--- pixelClk                   	
     |
     +--- kbdController          
     |   |
-    |   +--- kbdHandler             ( 100% - Tested )
+    |   +--- kbdHandler             	
     |   |
-    |   +--- ps2Decode              ( 90% -  More Tests Pending )
+    |   +--- ps2Decode              	
     |
-    +--- inputDecode                ( 90% -  More Tests Pending )
+    +--- inputDecode                	
     |    |
-    |    +--- colorController            ( 100% - Tested )
+    |    +--- colorController           
     |        |
-    |        +--- UpDownCounter3bit      ( 100% - Tested )
+    |        +--- UpDownCounter3bit     
     |
     +--- dispController                   
     |   |
-    |   +--- vgaHandler             ( 100% - Tested )
+    |   +--- vgaHandler
     |   |
-    |   +--- charController         ( 100% - Tested )       
+    |   +--- charController            
     |
     +--- romController
         |
-        +--- charRom                    ( 100% - Tested )
+        +--- charRom                   
     
    

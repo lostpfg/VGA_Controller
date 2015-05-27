@@ -23,24 +23,24 @@ module  charHandler  ( clock, reset, pixelCnt, lineCnt, charRgbDepth, bkRgbDepth
  
     input                     clock;
     input                     reset;
-	  input							        flashClk;
-    input         [9:0]       pixelCnt; /* Counter of pixels in a line */
-    input         [8:0]       lineCnt;  /* Counter of lines per frame */
-    input         [8:0]       charRgbDepth; /* Depth of each Color */
-	  input         [8:0]       bkRgbDepth; /* Depth of each Color */
-    input         [2:0]       charSize; /* Defines size of character  */
-    input                     bitDisp;
-	  input         [9:0]       upOffset;
+    input                     flashClk;     /* Tracks the flash clock edge */
+    input         [9:0]       pixelCnt;     /* Counter of pixels in a line of the active region */
+    input         [8:0]       lineCnt;      /* Counter of lines in a frame of active region */
+    input         [8:0]       charRgbDepth; /* Tracks the depth of each Color of the drawable object */
+    input         [8:0]       bkRgbDepth;   /* Tracks the depth of each Color of the background */
+    input         [2:0]       charSize;     /* Tracks the size of the drawable object */
+    input                     bitDisp;      /* Tracks wether a bit of the drawable object is displayed or not */
+    input         [9:0]       upOffset;
 
-    reg                       colEn;
-    reg                       rowEn;
-    reg                       reqRow;  
-    reg                       reqCol;
+    reg                       colEn;        /* ......  */
+    reg                       rowEn;        /* ......  */
+    reg                       reqRow;       /* ......  */
+    wire                      reqCol;       /* ......  */
 
-    output reg    [8:0]       vgaRGB;
-    output                    readEn;
-    output reg    [3:0]       rowCnt;    /* Counter of lines in active Region */
-    output reg    [2:0]       colCnt;    /* Counter of pixels in active Region */
+    output reg    [8:0]       vgaRGB;       /* ......  */
+    output                    readEn;       /* ......  */
+    output reg    [3:0]       rowCnt;       /* Counter of lines in active Region */
+    output reg    [2:0]       colCnt;       /* Counter of pixels in active Region */
 
     /* Active Display Regions -- Center of the Screen @ sizeof 16x8 */
 
@@ -59,7 +59,7 @@ module  charHandler  ( clock, reset, pixelCnt, lineCnt, charRgbDepth, bkRgbDepth
     assign posHorEnd   = ( ( VDT - VAL*CHM )/2 ) + VAL*CHM;
 
     always @ ( posedge clock or posedge reset ) begin
-        if ( reset )
+        if ( reset ) /* On reset set row counter to 0 */
           begin
             rowCnt  <= 4'd0;
             rowEn   <= 1'b0;
@@ -103,15 +103,7 @@ module  charHandler  ( clock, reset, pixelCnt, lineCnt, charRgbDepth, bkRgbDepth
           reqRow   <= ~reqRow;
     end
 
-    always @ ( posedge clock or posedge reset ) begin
-        if ( reset )
-          reqCol   <= 1'b0;
-        else if ( pixelCnt == ( posVerStart - 2 )
-          reqCol   <= ~reqCol;
-        else if ( pixelCnt == ( posVerStart - 1 )
-          reqCol   <= ~reqCol;
-    end
-
+    assign reqCol = ( pixelCnt == ( posVerStart - 2 ) );
     assign readEn = reqCol && reqRow;
 
     always @ ( posedge clock or posedge reset ) begin
