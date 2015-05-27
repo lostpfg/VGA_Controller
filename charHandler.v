@@ -19,27 +19,28 @@
 *                                                                       *
 *-----------------------------------------------------------------------*/
 
-module  charHandler  ( clock, reset, pixelCnt, lineCnt, rgbDepth, charSize, bitDisp, readEn, rowCnt, colCnt, vgaRGB );
-    
+module  charHandler  ( clock, reset, pixelCnt, lineCnt, charRgbDepth, bkRgbDepth, flashClk, charSize, upOffset, bitDisp, readEn, rowCnt, colCnt, vgaRGB );
+ 
     input                     clock;
     input                     reset;
+	  input							        flashClk;
     input         [9:0]       pixelCnt; /* Counter of pixels in a line */
     input         [8:0]       lineCnt;  /* Counter of lines per frame */
-    input         [8:0]       rgbDepth; /* Depth of each Color */
+    input         [8:0]       charRgbDepth; /* Depth of each Color */
+	  input         [8:0]       bkRgbDepth; /* Depth of each Color */
     input         [2:0]       charSize; /* Defines size of character  */
     input                     bitDisp;
+	  input         [9:0]       upOffset;
 
     reg                       colEn;
     reg                       rowEn;
     reg                       reqRow;  
     reg                       reqCol;
-    reg           [3:0]       pixelDraw;
-    reg           [3:0]       lineDraw;
 
     output reg    [8:0]       vgaRGB;
     output                    readEn;
-    output reg    [2:0]       rowCnt;    /* Counter of lines in active Region */
-    output reg    [3:0]       colCnt;    /* Counter of pixels in active Region */
+    output reg    [3:0]       rowCnt;    /* Counter of lines in active Region */
+    output reg    [2:0]       colCnt;    /* Counter of pixels in active Region */
 
     /* Active Display Regions -- Center of the Screen @ sizeof 16x8 */
 
@@ -51,20 +52,26 @@ module  charHandler  ( clock, reset, pixelCnt, lineCnt, rgbDepth, charSize, bitD
     
     localparam CHM = 1;     /* Character Magnify */
 
+    assign posVerStart = ( ( VDT - VAL*CHM )/2 );
+    assign posVerEnd   = ( ( VDT - VAL*CHM )/2 ) + VAL*CHM;
+
+    assign posHorStart = ( ( VDT - VAL*CHM )/2 );
+    assign posHorEnd   = ( ( VDT - VAL*CHM )/2 ) + VAL*CHM;
+
     always @ ( posedge clock or posedge reset ) begin
         if ( reset )
           begin
-            rowCnt  <= 3'd0;
+            rowCnt  <= 4'd0;
             rowEn   <= 1'b0;
           end
-        else if ( lineCnt == ( ( VDT - VAL*CHM )/2 ) + VAL*CHM  - 1 ) /* Reached the last line of Active Region, so reset the counter */
+        else if ( lineCnt == posVerEnd - 1 ) /* Reached the last line of Active Region, so reset the counter */
           begin
-            rowCnt  <= 3'd0;    /* Clear Counter */
+            rowCnt  <= 4'd0;    /* Clear Counter */
             rowEn   <= ~rowEn;  /* Set Flag to low */
           end
-        else if ( ( lineCnt >= ( ( VDT - VAL*CHM )/2 ) -  1 ) && ( lineCnt < ( ( VDT - VAL*CHM )/2 ) + VAL*CHM - 1 ) ) /* Did not reach the last line, so increase the counter */
+        else if ( ( lineCnt >= ( posVerStart -  1 ) && ( lineCnt < ( posVerEnd - 1 ) /* Did not reach the last line, so increase the counter */
           begin
-            rowCnt  <=  lineCnt - ( ( VDT - VAL*CHM )/2 - 1 );
+            rowCnt  <=  lineCnt - ( posVerStart - 1 );
             rowEn   <=  1'b1;
           end
     end
@@ -72,17 +79,17 @@ module  charHandler  ( clock, reset, pixelCnt, lineCnt, rgbDepth, charSize, bitD
     always @ ( posedge clock or posedge reset ) begin
         if ( reset )
           begin
-            colCnt  <= 2'd0;
+            colCnt  <= 3'd0;
             colEn   <= 1'b0;
           end
-        else if ( pixelCnt == ( ( HDT - HAL*CHM )/2 ) + HAL*CHM - 1 ) /* Reached the last pixel of Active Region, so reset the counter */
+        else if ( pixelCnt == ( posHorEnd - 1 ) /* Reached the last pixel of Active Region, so reset the counter */
           begin
-            colCnt  <= 2'd0;
+            colCnt  <= 3'd0;
             colEn   <= ~colEn;
           end
-        else if ( ( pixelCnt >= ( ( HDT - HAL*CHM )/2 ) - 1 ) && ( pixelCnt < ( ( HDT - HAL*CHM )/2 ) + HAL*CHM - 1 ) )/* Did not reach the pixel line, so increase the counter */
+        else if ( ( pixelCnt >= ( posHorStart - 1 ) && ( pixelCnt < ( posHorEnd - 1 ) )/* Did not reach the pixel line, so increase the counter */
           begin
-            colCnt  <=  pixelCnt - ( ( HDT - HAL*CHM )/2 - 1 );
+            colCnt  <=  pixelCnt - ( posHorStart - 1 );
             colEn   <=  1'b1;
           end
     end
@@ -90,19 +97,19 @@ module  charHandler  ( clock, reset, pixelCnt, lineCnt, rgbDepth, charSize, bitD
     always @ ( posedge clock or posedge reset ) begin
         if ( reset )
           reqRow   <= 1'b0;
-        else if ( lineCnt == ( ( VDT - VAL*CHM )/2 ) + VAL*CHM - 1 )
+        else if ( lineCnt == ( posVerEnd - 1 )
           reqRow   <= ~reqRow;
-        else if ( lineCnt == ( ( VDT - VAL*CHM )/2 ) -  2 )
+        else if ( lineCnt == ( posVerStart - 2 )
           reqRow   <= ~reqRow;
     end
 
     always @ ( posedge clock or posedge reset ) begin
         if ( reset )
           reqCol   <= 1'b0;
-        else if ( pixelCnt == ( ( HDT - HAL*CHM )/2 ) - 2 )
+        else if ( pixelCnt == ( posVerStart - 2 )
           reqCol   <= ~reqCol;
-        else
-          reqCol   <= 1'b0;
+        else if ( pixelCnt == ( posVerStart - 1 )
+          reqCol   <= ~reqCol;
     end
 
     assign readEn = reqCol && reqRow;
@@ -110,10 +117,10 @@ module  charHandler  ( clock, reset, pixelCnt, lineCnt, rgbDepth, charSize, bitD
     always @ ( posedge clock or posedge reset ) begin
         if ( reset )
           vgaRGB <=  9'd0; /* Clear RGB Buffer */
-        else if ( rowEn && colEn && bitDisp ) /* Inside Active Region and Have a pixel to display */
-          vgaRGB  <= { rgbDepth[8:6], rgbDepth[5:3], rgbDepth[2:0] }; /* Pass each color's depth to output's buffer */
+        else if ( rowEn && colEn && bitDisp && ~flashClk ) /* Inside Active Region and Have a pixel to display */
+          vgaRGB  <= { charRgbDepth[8:6], charRgbDepth[5:3], charRgbDepth[2:0] }; /* Pass each color's depth to output's buffer */
         else 
-          vgaRGB <=  9'd0;   /* Outside Display Region everything is black and nothing to display */
+          vgaRGB <=  { bkRgbDepth[8:6], bkRgbDepth[5:3], bkRgbDepth[2:0] };   /* Outside Display Region everything is black and nothing to display */
     end
 
 endmodule

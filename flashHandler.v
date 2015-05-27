@@ -9,13 +9,19 @@
 *                      ____________                            *
 *                                                              *
 *--------------------------------------------------------------*/
-module flashHandler ( reset, enable, rgbDepth );
+module flashHandler ( clock, reset, enable, flashClk );
 
+  input           reset;
   input           clock;
   input           enable;
 
-  output  reg     flashCnt;
+  wire				flashCnt;
+
+  output reg 	      flashClk;
   
-  // ++++
+  flashClk i0 ( reset, clock, flashCnt );
+  
+  always @ ( posedge flashCnt )
+	flashClk <= enable && ( ~flashClk );
 
 endmodule

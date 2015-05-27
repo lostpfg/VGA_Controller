@@ -11,7 +11,7 @@
 *                                                             *
 *-------------------------------------------------------------*/
 
-module topModule ( boardClk, reset, ps2Clk, ps2Data, vgaRGB, vgaHsync, vgaVsync );
+module topModule ( boardClk, reset, ps2Clk, ps2Data, vgaRGB, vgaHsync, vgaVsync, flashClk );
 
   input           boardClk;
   input           reset;
@@ -24,22 +24,23 @@ module topModule ( boardClk, reset, ps2Clk, ps2Data, vgaRGB, vgaHsync, vgaVsync 
   wire    [7:0]   romByte;
   wire    [2:0]   userNum;  /* Tracks user Number input from keyboard */
   wire    [2:0]   charSize; /* Tracks user character size from keyboard */
-  wire    [2:0]   rgbIncEn; /* Tracks user character color from keyboard */
   wire    [2:0]   upOffset; 
   wire    [2:0]   downOffset;
   wire    [2:0]   leftOffset;
   wire    [2:0]   rightOffset;
-  wire    [8:0]   rgbDepth;
-  wire            enFlash;
+  wire    [8:0]   charRgbDepth;
+  wire    [8:0]   BkRgbDepth;
+ // wire            flashClk;
+  wire 				readEn;
   
   output  [8:0]   vgaRGB;
   output          vgaHsync;
   output          vgaVsync;
-
+	output flashClk;
   pixelClk          i0  ( boardClk, reset, pixelClk );
   kbdController     i1  ( pixelClk, reset, ps2Clk, ps2Data, ps2OutCode );
-  inputDecode       i2  ( pixelClk, reset, ps2OutCode, userNum, charSize, rgbDepth, upOffset, downOffset, leftOffset, rightOffset, enFlash );
-  dispController    i3  ( pixelClk, reset, rgbDepth, charSize, upOffset, downOffset, leftOffset, rightOffset, romByte, addrOffset, vgaRGB, vgaHsync, vgaVsync );
+  inputDecode       i2  ( pixelClk, reset, ps2OutCode, userNum, charSize, charRgbDepth, BkRgbDepth, upOffset, downOffset, leftOffset, rightOffset, flashClk );
+  dispController    i3  ( pixelClk, reset, charRgbDepth, BkRgbDepth, flashClk, charSize, upOffset, downOffset, leftOffset, rightOffset, romByte, readEn, addrOffset, vgaRGB, vgaHsync, vgaVsync );
   romController     i4  ( reset, readEn, userNum, addrOffset, romByte ) ; 
 
 endmodule

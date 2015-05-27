@@ -15,7 +15,7 @@
 *                                                                       *
 *-----------------------------------------------------------------------*/
 
-module vgaHandler ( clock, reset, hSync, vSync, pixelCnt, lineCnt, compBlank );
+module vgaHandler ( clock, reset, hSync, pixelCnt, vSync, lineCnt, compBlank  );
 
     input               clock;           /* Pixel Clock */
     input               reset;              /* Reset */
@@ -24,7 +24,7 @@ module vgaHandler ( clock, reset, hSync, vSync, pixelCnt, lineCnt, compBlank );
     output reg          vSync;              /* Vertical Syncing Signal */
     output reg  [9:0]   pixelCnt;           /* Counter for pixels in a line */
     output reg  [8:0]   lineCnt;            /* Counter of  lines */
-    output reg          compBlank;          /* Counter of  lines */
+    output              compBlank;          /* Counter of  lines */
     
     reg                 hBlank;             /* Composite blanking signal */
     reg                 vBlank;             /* Composite blanking signal */
@@ -145,13 +145,6 @@ module vgaHandler ( clock, reset, hSync, vSync, pixelCnt, lineCnt, compBlank );
     *   or Vertical signal are high respectively. Otherwise it is seted to low      *
     *-------------------------------------------------------------------------------*/
 
-    always @ ( posedge clock or posedge reset ) begin
-        if ( reset )
-            compBlank <= 1'b0;
-        else if ( hBlank || vBlank )
-            compBlank <= 1'b1;
-        else
-            compBlank <= 1'b0;
-    end
+    assign compBlank <= ( hBlank || vBlank );
 
 endmodule

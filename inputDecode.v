@@ -16,7 +16,7 @@
 *                                                                   *
 *-------------------------------------------------------------------*/
 
-module inputDecode ( clock , reset, inCode, userNum, charSize, rgbDepth, upOffset, downOffset, leftOffset, rightOffset, enFlash );
+module inputDecode ( clock , reset, inCode, userNum, charSize, charRgbDepth, bkRgbDepth, upOffset, downOffset, leftOffset, rightOffset, flashClk );
 
   input                   clock;
   input                   reset;
@@ -24,14 +24,17 @@ module inputDecode ( clock , reset, inCode, userNum, charSize, rgbDepth, upOffse
 
   output reg     [2:0]    userNum;
   output reg     [3:0]    charSize;
-  output reg     [8:0]    rgbDepth;
+  output		     [8:0]    charRgbDepth;
+  output		     [8:0]    bkRgbDepth;
   output reg     [7:0]    leftOffset;
   output reg     [7:0]    rightOffset;
   output reg     [7:0]    upOffset;
   output reg     [7:0]    downOffset;
-  output reg              enFlash;
-
-  wire           [2:0]    outColor;
+  output        		     flashClk;
+  reg              		  enFlash;
+  reg              	     enBkgrd;
+  
+  reg            [2:0]    outColor;
 
   initial 
     begin
@@ -40,15 +43,17 @@ module inputDecode ( clock , reset, inCode, userNum, charSize, rgbDepth, upOffse
     end
 
   /* Detect codes relevant to number input */
-
-  always @ ( posedge clock or posedge reset ) begin
-      if ( reset )
-          userNum  <= 3'h4;
-      else
-        if ( ( inCode >= 4'h0 ) && ( inCode <= 4'h3 ) )
-          userNum <= inCode - 1'b1;
-  end
-
+	always @ ( posedge clock or posedge reset ) begin
+	    if ( reset )
+	        userNum  <= 3'h4;
+	    else
+			case ( inCode )
+				4'h0 : userNum <= 3'h0; 
+				4'h1 : userNum <= 3'h1; 
+				4'h2 : userNum <= 3'h2; 
+				4'h3 : userNum <= 3'h3; 
+			endcase
+	end
   /* Detect codes relevant to RGB input */
 
   always @ ( posedge clock or posedge reset ) begin
@@ -63,7 +68,16 @@ module inputDecode ( clock , reset, inCode, userNum, charSize, rgbDepth, upOffse
         endcase
   end
 
-  colorHandler i0 ( reset, outColor, rgbDepth );
+  always @ ( posedge clock or posedge reset ) begin
+      if ( reset )
+          enBkgrd <= 1'b0;
+      else
+        case ( inCode )
+          4'hD : enBkgrd  <= ~enBkgrd;
+        endcase
+  end
+
+  colorHandler i0 ( reset, enBkgrd, outColor, charRgbDepth, bkRgbDepth );
 
   /* Detect Codes relevant to character position */
 
@@ -107,10 +121,11 @@ module inputDecode ( clock , reset, inCode, userNum, charSize, rgbDepth, upOffse
         end
       else
         case ( inCode )
-          4'hD : enFlash  <= ~enFlash;
+          4'hE : enFlash  <= ~enFlash;
         endcase
   end
 
-  flashHandler i1 ( clock, reset, enFlash, flashCnt );
+ flashHandler i1 ( clock, reset, enFlash, flashClk );
+
 
 endmodule

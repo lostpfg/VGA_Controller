@@ -57,7 +57,6 @@ module kbdHandler ( reset, clock, ps2clk, ps2data, scancode );
                cnt <= 0;
                if ((shift[0] == 0) && (ps2data == 1) && (^shift[9:1]==1)) // A well received serial packet
                  begin
-                   scancode   <= 8'd0;
                    if (f0) // following a scancode of f0. So a key is released ! 
                      begin
                       scancode <= shift[8:1];
@@ -73,4 +72,6 @@ module kbdHandler ( reset, clock, ps2clk, ps2data, scancode );
                cnt <= cnt+1;
              end
          end
+	 else
+		scancode   <= 8'd0;
 endmodule

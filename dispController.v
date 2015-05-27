@@ -19,7 +19,9 @@
 
 module  dispController  ( clock, 
                           reset,
-                          rgbDepth,
+                          charRgbDepth,
+								          bkRgbDepth,
+								          flashClk,
                           charSize,
                           upOffset,
                           downOffset,
@@ -32,34 +34,37 @@ module  dispController  ( clock,
                           vgaHsync, 
                           vgaVsync 
                         );
-
   input                   clock;
   input                   reset;
-  input         [8:0]     rgbDepth;
-  input         [2:0]     upOffset;
+  input                   flashClk;
+  input         [8:0]     charRgbDepth;
+  input         [8:0]     bkRgbDepth;
+  input         [3:0]     charSize;
+  input         [9:0]     upOffset;
   input         [2:0]     downOffset;
   input         [2:0]     leftOffset;
   input         [2:0]     rightOffset;
   input         [7:0]     romByte;
 
-  wire                    bitDisp
+  wire                    bitDisp;
   wire                    hSync;
   wire                    vSync;
   wire          [9:0]     pixelCnt;
   wire          [8:0]     lineCnt;
   wire                    compBlank;
-
-
-  output                  readEn;
+  wire			 [2:0]     byteOffset;
+  wire 			 [8:0]     charRGB;
+  
   output        [3:0]     addOffset;
+  output                  readEn;
   output  reg             vgaVsync;
   output  reg             vgaHsync;
   output  reg   [8:0]     vgaRGB;
 
   assign bitDisp = romByte[7-byteOffset];
-
-  vgaHandler         i0       ( clock, reset, hSync, vSync, pixelCnt, lineCnt, compBlank );
-  charHandler        i1       ( clock, reset, pixelCnt, lineCnt, rgbDepth, charSize, bitDisp, readEn, addOffset, byteOffset, vgaRGB );
+  
+  vgaHandler         i0       ( clock, reset, hSync, pixelCnt, vSync, lineCnt, compBlank );
+  charHandler        i1       ( clock, reset, pixelCnt, lineCnt, charRgbDepth, bkRgbDepth, flashClk, charSize, upOffset, bitDisp, readEn, addOffset, byteOffset, charRGB );
 
   always @ ( posedge clock or posedge reset ) begin
     if ( reset ) 

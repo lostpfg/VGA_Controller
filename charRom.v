@@ -42,7 +42,7 @@ module charRom ( inAddress, outData );
 
       6'h10: outData <= 8'h3C; /*   ####   */
       6'h11: outData <= 8'hFE; /* #######  */
-      6'h12: outData <= 8'hE3; /* ###   ## */
+      6'h12: outData <= 8'hC3; /* ##    ## */
       6'h13: outData <= 8'h03; /*       ## */
       6'h14: outData <= 8'h03; /*       ## */
       6'h15: outData <= 8'h03; /*       ## */
@@ -78,11 +78,11 @@ module charRom ( inAddress, outData );
 
       /* 00h: 4 */
 
-      6'h30: outData <= 8'h1C; /*    ####  */
-      6'h31: outData <= 8'h3C; /*   #####  */ 
-      6'h32: outData <= 8'h76; /*  ### ##  */ 
-      6'h33: outData <= 8'hE6; /* ###  ##  */ 
-      6'h34: outData <= 8'hE6; /* ###  ##  */ 
+      6'h30: outData <= 8'h1E; /*    ####  */
+      6'h31: outData <= 8'h3E; /*   #####  */ 
+      6'h32: outData <= 8'h66; /*  ##  ##  */ 
+      6'h33: outData <= 8'hC6; /* ##   ##  */ 
+      6'h34: outData <= 8'hC6; /* ##   ##  */ 
       6'h35: outData <= 8'hC6; /* ##   ##  */ 
       6'h36: outData <= 8'hC6; /* ##   ##  */ 
       6'h37: outData <= 8'hFF; /* ######## */
