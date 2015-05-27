@@ -43,7 +43,6 @@ module  dispController  ( clock,
   input         [7:0]     romByte;
 
   wire                    bitDisp
-
   wire                    hSync;
   wire                    vSync;
   wire          [9:0]     pixelCnt;

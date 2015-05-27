@@ -29,8 +29,6 @@ module  charHandler  ( clock, reset, pixelCnt, lineCnt, rgbDepth, charSize, bitD
     input         [2:0]       charSize; /* Defines size of character  */
     input                     bitDisp;
 
-
-
     reg                       colEn;
     reg                       rowEn;
     reg                       reqRow;  
@@ -39,7 +37,7 @@ module  charHandler  ( clock, reset, pixelCnt, lineCnt, rgbDepth, charSize, bitD
     reg           [3:0]       lineDraw;
 
     output reg    [8:0]       vgaRGB;
-    output reg                readEn;
+    output                    readEn;
     output reg    [2:0]       rowCnt;    /* Counter of lines in active Region */
     output reg    [3:0]       colCnt;    /* Counter of pixels in active Region */
 
@@ -92,7 +90,7 @@ module  charHandler  ( clock, reset, pixelCnt, lineCnt, rgbDepth, charSize, bitD
     always @ ( posedge clock or posedge reset ) begin
         if ( reset )
           reqRow   <= 1'b0;
-        else if ( lineCnt == ( ( VDT - VAL*CHM )/2 ) + VAL*CHM - 2 )
+        else if ( lineCnt == ( ( VDT - VAL*CHM )/2 ) + VAL*CHM - 1 )
           reqRow   <= ~reqRow;
         else if ( lineCnt == ( ( VDT - VAL*CHM )/2 ) -  2 )
           reqRow   <= ~reqRow;
@@ -107,14 +105,7 @@ module  charHandler  ( clock, reset, pixelCnt, lineCnt, rgbDepth, charSize, bitD
           reqCol   <= 1'b0;
     end
 
-    always @ ( posedge clock or posedge reset ) begin
-        if ( reset )
-          reqCol   <= 1'b0;
-        else if ( reqRow && reqCol )
-          readEn   <= 1'b1;
-        else
-          reqCol   <= 1'b0;
-    end
+    assign readEn = reqCol && reqRow;
 
     always @ ( posedge clock or posedge reset ) begin
         if ( reset )

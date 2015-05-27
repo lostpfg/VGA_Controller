@@ -16,7 +16,9 @@
     |   |
     |   +--- charController         ( 100% - Tested )       
     |
-    +--- charRom                    ( 100% - Tested )
+    +--- romController
+    |   |
+    |   +--- charRom                    ( 100% - Tested )
     |
     +--- colorController            ( 100% - Tested )
         |

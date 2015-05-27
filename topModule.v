@@ -19,6 +19,7 @@ module topModule ( boardClk, reset, ps2Clk, ps2Data, vgaRGB, vgaHsync, vgaVsync 
   input           ps2Data;
 
   wire            pixelClk;  
+  wire    [3:0]   ps2OutCode;
   wire    [3:0]   addrOffset;
   wire    [7:0]   romByte;
   wire    [2:0]   userNum;  /* Tracks user Number input from keyboard */
@@ -37,9 +38,8 @@ module topModule ( boardClk, reset, ps2Clk, ps2Data, vgaRGB, vgaHsync, vgaVsync 
 
   pixelClk          i0  ( boardClk, reset, pixelClk );
   kbdController     i1  ( pixelClk, reset, ps2Clk, ps2Data, ps2OutCode );
-  inputDecode       i2  ( pixelClk, reset, ps2OutCode, userNum, charSize, rgbIncEn, upOffset, downOffset, leftOffset, rightOffset, enFlash );
-  colorController   i3  ( reset, rgbIncEn, rgbDepth );
-  dispController    i4  ( pixelClk, reset, rgbDepth, charSize, upOffset, downOffset, leftOffset, rightOffset, romByte, addrOffset, vgaRGB, vgaHsync, vgaVsync );
-  charRom           i5  ( readEn, {userNum, addrOffset}, romByte );
+  inputDecode       i2  ( pixelClk, reset, ps2OutCode, userNum, charSize, rgbDepth, upOffset, downOffset, leftOffset, rightOffset, enFlash );
+  dispController    i3  ( pixelClk, reset, rgbDepth, charSize, upOffset, downOffset, leftOffset, rightOffset, romByte, addrOffset, vgaRGB, vgaHsync, vgaVsync );
+  romController     i4  ( reset, readEn, userNum, addrOffset, romByte ) ; 
 
 endmodule

@@ -10,14 +10,12 @@
 *                                                             *
 *-------------------------------------------------------------*/
 
-module charRom ( readEn, inAddress, outData );
+module charRom ( inAddress, outData );
 
-  input               readEn;
   input       [5:0]   inAddress;
-
   output reg  [7:0]   outData;
 
-  always @ ( posedge readEn ) begin
+  always @ ( inAddress ) begin
 
     case ( inAddress )
 
