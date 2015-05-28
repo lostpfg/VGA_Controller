@@ -8,8 +8,20 @@
 *                     |               |                        * 
 *                      _______________                         *
 *                                                              *
+*                                                              *
+*        _   _   _   _   _   _   _   _   _   _   _             *
+*      _| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_           *
+*          
+*                _______________                 ___
+*      _________|               |_______________|
+*
+*                ___             ___             ___
+*      _________|   |___________|   |___________|
+*
+*
+*                                                              *
 *--------------------------------------------------------------*/
-module pixelClk ( clock, reset, clockMod4 );
+module mod4 ( clock, reset, clockMod4 );
 
   input           clock;
   input           reset;
@@ -27,3 +39,23 @@ module pixelClk ( clock, reset, clockMod4 );
       cnt <= cnt + 1;
 
 endmodule
+
+module pixelClk ( clock, reset, outClk );
+
+  input           clock;
+  input           reset;
+
+  wire            clockMod4;
+
+  output   reg    outClk;
+
+  mod4  i0  ( clock, reset, clockMod4 );
+
+  always @ ( posedge clockMod4 or posedge reset )
+    if ( reset ) 
+      outClk <= 0; /* Clear Counter */
+    else 
+      outClk <= ~outClk;
+
+endmodule
+
