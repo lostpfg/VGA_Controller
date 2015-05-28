@@ -7,10 +7,7 @@
 *  reset       ------->  |   dispController    | -------> readEn     *
 *  rgbDepth    --/09-->  |                     | -------> addOffset  *
 *  charSize    --/09-->  |                     | -------> vgaHsync   *
-*  upOffset    --/09-->  |                     | -------> vgaVsync   *
-*  downOffset  --/09-->  |                     |                     *
-*  leftOffset  --/09-->  |                     |                     *
-*  rightOffset --/09-->  |                     |                     *
+*  charOffset  --/04-->  |                     | -------> vgaVsync   *
 *  romByte     --/08-->  |                     |                     *
 *                        |                     |                     *
 *                         _____________________                      *
@@ -19,31 +16,27 @@
 
 module  dispController  ( clock, 
                           reset,
-                          charRgbDepth,
-								          bkRgbDepth,
+                          charRGB,
+								          bgRGB,
 								          flashClk,
                           charSize,
-                          upOffset,
-                          downOffset,
-                          leftOffset,
-                          rightOffset,
+                          charOffset,
                           romByte,
                           readEn,
                           addOffset,
                           vgaRGB, 
                           vgaHsync, 
-                          vgaVsync 
+                          vgaVsync
                         );
+								
+		
   input                   clock;
   input                   reset;
   input                   flashClk;
-  input         [8:0]     charRgbDepth;
-  input         [8:0]     bkRgbDepth;
+  input         [8:0]     charRGB;
+  input         [8:0]     bgRGB;
   input         [3:0]     charSize;
-  input         [9:0]     upOffset;
-  input         [2:0]     downOffset;
-  input         [2:0]     leftOffset;
-  input         [2:0]     rightOffset;
+  input         [3:0]	    charOffset;
   input         [7:0]     romByte;
 
   wire                    bitDisp;
@@ -52,21 +45,26 @@ module  dispController  ( clock,
   wire          [9:0]     pixelCnt;
   wire          [8:0]     lineCnt;
   wire                    compBlank;
-  wire			 [2:0]     byteOffset;
-  wire 			 [8:0]     charRGB;
+  wire			    [2:0]     byteOffset;
+  wire 			    [8:0]     charRGB;
+  wire   		    [8:0]     posVerStart;
+  wire  	 		  [8:0]     posVerEnd;
+  wire   	      [8:0]     posHorStart;
+  wire	        [8:0]     posHorEnd;
   
   output        [3:0]     addOffset;
   output                  readEn;
   output  reg             vgaVsync;
   output  reg             vgaHsync;
   output  reg   [8:0]     vgaRGB;
-
+	
   assign bitDisp = romByte[7-byteOffset];
   
-  vgaHandler         i0       ( clock, reset, hSync, pixelCnt, vSync, lineCnt, compBlank );
-  charHandler        i1       ( clock, reset, pixelCnt, lineCnt, charRgbDepth, bkRgbDepth, flashClk, charSize, upOffset, bitDisp, readEn, addOffset, byteOffset, charRGB );
+  vgaHandler    i0  ( clock, reset, hSync, pixelCnt, vSync, lineCnt, compBlank );
+  charHandler   i1  ( clock, reset, pixelCnt, lineCnt, charRGB, bgRGB, flashClk, posVerStart, posVerEnd , posHorStart, posHorEnd, bitDisp, readEn, addOffset, byteOffset, charRGB );
+  offsetHandler i2  ( clock, reset, charSize, charOffset, posVerStart, posVerEnd , posHorStart, posHorEnd );
 
-  always @ ( posedge clock or posedge reset ) begin
+ always @ ( posedge clock or posedge reset ) begin
     if ( reset ) 
       vgaRGB  <= 9'd0; /* Clear Local Buffer */
     else 

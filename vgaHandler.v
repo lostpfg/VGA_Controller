@@ -147,6 +147,6 @@ module vgaHandler ( clock, reset, hSync, pixelCnt, vSync, lineCnt, compBlank  );
     *   or Vertical signal are high respectively. Otherwise it is seted to low      *
     *-------------------------------------------------------------------------------*/
 
-    assign compBlank <= ( hBlank || vBlank );
+    assign compBlank = ( hBlank || vBlank );
 
 endmodule

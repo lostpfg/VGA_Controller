@@ -1,24 +1,38 @@
 +--- topModule
     |
-    +--- pixelClk                   	
-    |
-    +--- kbdController          
+    +--- pixelClk   
     |   |
-    |   +--- kbdHandler             	
-    |   |
-    |   +--- ps2Decode              	
+    |   +--- cnt3
     |
-    +--- inputDecode                	
+    +--- kbdController
+    |   |
+    |   +--- kbdHandler 
+    |   |
+    |   +--- ps2Decode
+    |
+    +--- inputDecode
     |    |
-    |    +--- colorController           
-    |        |
-    |        +--- UpDownCounter3bit     
+    |    +--- colorController
+    |    |    |
+    |    |    +--- UpDownCounter3bit
+    |    |
+    |    +--- flashHandler
+    |         |
+    |         +--- flashClk
+    |             |
+    |             +--- cnt64 
+    |             |
+    |             +--- cnt25 
+    |             |
+    |             +--- cnt4
     |
-    +--- dispController                   
+    +--- dispController
     |   |
     |   +--- vgaHandler
     |   |
-    |   +--- charController            
+    |   +--- charController
+    |   |
+    |   +--- offsetHandler
     |
     +--- romController
         |

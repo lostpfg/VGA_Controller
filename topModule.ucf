@@ -20,4 +20,3 @@ net vgaRGB<0> loc  = c8;
 # -- Syncing -----------
 net vgaHsync  loc  = b7;
 net vgaVsync  loc  = d8;
-net flashClk  loc=r10;

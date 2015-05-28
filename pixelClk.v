@@ -11,14 +11,10 @@
 *                                                              *
 *        _   _   _   _   _   _   _   _   _   _   _             *
 *      _| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_           *
-*          
-*                _______________                 ___
-*      _________|               |_______________|
-*
-*                ___             ___             ___
-*      _________|   |___________|   |___________|
-*
-*
+*                                                              *
+*                _______________                 ___           *
+*      _________|               |_______________|              *
+*                                                              *
 *                                                              *
 *--------------------------------------------------------------*/
 module mod4 ( clock, reset, clockMod4 );
@@ -47,15 +43,17 @@ module pixelClk ( clock, reset, outClk );
 
   wire            clockMod4;
 
-  output   reg    outClk;
+  output       outClk;
 
   mod4  i0  ( clock, reset, clockMod4 );
-
+/*
   always @ ( posedge clockMod4 or posedge reset )
     if ( reset ) 
-      outClk <= 0; /* Clear Counter */
+      outClk <= 0; 
     else 
       outClk <= ~outClk;
+*/
+assign outClk = clockMod4;
 
 endmodule
 
