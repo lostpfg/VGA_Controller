@@ -19,7 +19,7 @@ module  offsetHandler  ( reset, charSize, OffsetFlag, posVerStart, posVerEnd , p
  
     input                     reset;
     input         [2:0]       charSize;     /* Defines size of character  */
-    input         [3:0]       OffsetFlag;   /* Defines offset increament { up, down, left, right }  */
+    input         [3:0]       OffsetFlag;   /* Defines offset increament { Right, Left, Down, Up }  */
 
     reg     signed   [8:0]    horOffset;
     reg     signed   [8:0]    verOffset;
@@ -44,23 +44,31 @@ module  offsetHandler  ( reset, charSize, OffsetFlag, posVerStart, posVerEnd , p
   assign   posHorStart = ( ( HDT - HAL*CHM )/2 ) + horOffset;
   assign   posHorEnd   = posHorStart + HAL*CHM;
 
-  always @ ( posedge leftOffsetFlag )
+  always @ ( posedge reset )
+    begin
+      horOffset <= 9'd0;
+      verOffset <= 9'd0;
+    end
+
+  always @ ( posedge OffsetFlag[0] )
     if ( posHorStart >=  HAL*CHM )
       horOffset <= horOffset - HAL*CHM;
    
-  always @ ( posedge rightOffsetFlag ) begin
+  always @ ( posedge OffsetFlag[1] ) begin
     if ( posHorEnd <=  ( ( HDT  - HAL*CHM ) - 1 ) ) 
       horOffset <= horOffset + HAL*CHM;
   end
-  
-  always @ ( posedge downOffsetFlag ) begin
+
+  always @ ( posedge OffsetFlag[2] ) begin
+    if ( posVerStart >=  VAL*CHM )
+      verOffset <= verOffset - VAL*CHM;
+  end
+
+  always @ ( posedge OffsetFlag[3] ) begin
     if ( posVerEnd <=  ( ( VDT  - VAL*CHM ) - 1 ) ) 
       verOffset <= verOffset + VAL*CHM;
   end
    
-  always @ ( posedge upOffsetFlag ) begin
-    if ( posVerStart >=  VAL*CHM )
-      verOffset <= verOffset + VAL*CHM;
-  end
+
   
 endmodule
