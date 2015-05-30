@@ -6,58 +6,61 @@
 *  clock       ------->  |                        |                     * 
 *  reset       ------->  |                        |                     * 
 *  pixelCnt    --/10-->  |                        | -------> readEn     *
-*  lineCnt     --/09-->  |                        | -------> rowCnt     *
-*  rgbDepth    --/09-->  |      charHandler       | -------> colCnt     * 
-*  charSize    ------->  |                        | --/09--> vgaRGB     *
+*  lineCnt     --/09-->  |                        | --/04--> rowCnt     *
+*  rgbDepth    --/09-->  |                        | --/03--> colCnt     * 
+*  bgRGB       --/09-->  |                        | --/09--> vgaRGB     *
+*  bgRGB       --/09-->  |      charHandler       |                     *
+*  posVerStart --/10-->  |                        |                     *
+*  posVerEnd   --/09-->  |                        |                     *
+*  posHorStart --/09-->  |                        |                     *
+*  posHorEnd   --/09-->  |                        |                     *
 *  bitDisp     ------->  |                        |                     *
+*                        |                        |                     * 
 *                         ________________________                      *
 *                                                                       *
 *                                                                       *
 *-----------------------------------------------------------------------*/
 
-module  charHandler  ( clock, reset, pixelCnt, lineCnt, charRGB, bgRGB, flashClk, posVerStart, posVerEnd , posHorStart, posHorEnd, bitDisp, readEn, rowCnt, colCnt, vgaRGB );
+module  charHandler  (  clock, 
+                        reset, 
+                        pixelCnt, 
+                        lineCnt, 
+                        charRGB, 
+                        bgRGB, 
+                        flashClk, 
+                        posVerStart, 
+                        posVerEnd , 
+                        posHorStart, 
+                        posHorEnd, 
+                        bitDisp, 
+                        readEn, 
+                        rowCnt, 
+                        colCnt, 
+                        vgaRGB 
+                      );
 
-    input                     clock;
-    input                     reset;
-    input                     flashClk;     /* Tracks the flash clock edge */
-    input         [9:0]       pixelCnt;     /* Counter of pixels in a line of the active region */
-    input         [8:0]       lineCnt;      /* Counter of lines in a frame of active region */
-    input         [8:0]       charRGB;      /* Tracks the depth of each Color of the drawable object */
-    input         [8:0]       bgRGB;        /* Tracks the depth of each Color of the background */
-    input                     bitDisp;      /* Tracks wether a bit of the drawable object is displayed or not */
-    input   		  [8:0]       posVerStart;
-    input  	 		  [8:0]       posVerEnd;
-    input   	    [8:0]       posHorStart;
-    input	        [8:0]       posHorEnd;
+    input                        clock;
+    input                        reset;
+    input                        flashClk;     /* Tracks the flash clock edge */
+    input            [9:0]       pixelCnt;     /* Counter of pixels in a line of the active region */
+    input            [8:0]       lineCnt;      /* Counter of lines in a frame of active region */
+    input            [8:0]       charRGB;      /* Tracks the depth of each Color of the drawable object */
+    input            [8:0]       bgRGB;        /* Tracks the depth of each Color of the background */
+    input                        bitDisp;      /* Tracks wether a bit of the drawable object is displayed or not */
+    input            [9:0]       posVerStart;
+    input            [8:0]       posVerEnd;
+    input            [8:0]       posHorStart;
+    input            [8:0]       posHorEnd;
+   
+    output reg       [8:0]       vgaRGB;       /* ......  */
+    output                       readEn;       /* ......  */
+    output reg       [3:0]       rowCnt;       /* Counter of lines in active Region */
+    output reg       [2:0]       colCnt;       /* Counter of pixels in active Region */
 
-    reg      	                colEn;        /* ......  */
-    reg                       rowEn;        /* ......  */
-    reg                       reqRow;       /* ......  */
-    reg                       reqCol;       /* ......  */
-	 
-    output reg    [8:0]       vgaRGB;       /* ......  */
-    output                    readEn;       /* ......  */
-    output reg    [3:0]       rowCnt;       /* Counter of lines in active Region */
-    output reg    [2:0]       colCnt;       /* Counter of pixels in active Region */
-  
-
-    always @ ( posedge clock or posedge reset ) begin
-        if ( reset )
-          begin
-            rowCnt  <= 4'd0;
-            rowEn   <= 1'b0;
-          end
-        else if ( lineCnt == ( posVerEnd  - 1 ) ) /* Reached the last line of Active Region, so reset the counter */
-          begin
-            rowCnt  <= 4'd0;    /* Clear Counter */
-            rowEn   <= 1'b0;  /* Set Flag to low */
-          end
-        else if ( ( lineCnt >= ( posVerStart -  1 ) ) && ( lineCnt < ( posVerEnd - 1 ) ) )/* Did not reach the last line, so increase the counter */
-          begin
-            rowCnt  <=  lineCnt - ( posVerStart - 1 );
-            rowEn   <=  1'b1;
-          end
-    end
+    reg                          colEn;        /* ......  */
+    reg                          rowEn;        /* ......  */
+    reg                          reqRow;       /* ......  */
+    reg                          reqCol;       /* ......  */
 
     always @ ( posedge clock or posedge reset ) begin
         if ( reset )
@@ -65,12 +68,12 @@ module  charHandler  ( clock, reset, pixelCnt, lineCnt, charRGB, bgRGB, flashClk
             colCnt  <= 3'd0;
             colEn   <= 1'b0;
           end
-        else if ( pixelCnt == ( posHorEnd - 1 ) ) /* Reached the last pixel of Active Region, so reset the counter */
+        else if ( pixelCnt == posHorEnd ) /* Reached the last pixel of Active Region, so reset the counter */
           begin
             colCnt  <= 3'd0;
             colEn   <= 1'b0;
           end
-        else if ( ( pixelCnt >= ( posHorStart - 1 ) ) && ( pixelCnt < ( posHorEnd - 1 ) ) )/* Did not reach the pixel line, so increase the counter */
+        else if ( ( pixelCnt >= ( posHorStart - 1 ) ) && ( pixelCnt <= ( posHorEnd - 1 ) ) )/* Did not reach the pixel line, so increase the counter */
           begin
             colCnt  <=  pixelCnt - ( posHorStart - 1 );
             colEn   <=  1'b1;
@@ -79,10 +82,28 @@ module  charHandler  ( clock, reset, pixelCnt, lineCnt, charRGB, bgRGB, flashClk
 
     always @ ( posedge clock or posedge reset ) begin
         if ( reset )
+          begin
+            rowCnt  <= 4'd0;
+            rowEn   <= 1'b0;
+          end
+        else if ( lineCnt == posVerEnd ) /* Reached the last line of Active Region, so reset the counter */
+          begin
+            rowCnt  <= 4'd0;    /* Clear Counter */
+            rowEn   <= 1'b0;  /* Set Flag to low */
+          end
+        else if ( ( lineCnt >= ( posVerStart -  1 ) ) && ( lineCnt <= ( posVerEnd - 1 ) ) )/* Did not reach the last line, so increase the counter */
+          begin
+            rowCnt  <=  lineCnt - ( posVerStart - 1 );
+            rowEn   <=  1'b1;
+          end
+    end
+
+    always @ ( posedge clock or posedge reset ) begin
+        if ( reset )
           reqRow   <= 1'b0;
-        else if ( lineCnt == ( posVerEnd- 1 ) )
+        else if ( lineCnt == ( posVerEnd - 2 ) )
           reqRow   <= 1'b0;
-        else if ( lineCnt == ( posVerStart -  2 ) )
+        else if ( lineCnt == ( posVerStart - 2 ) )
           reqRow   <= 1'b1;
     end
 
@@ -94,7 +115,7 @@ module  charHandler  ( clock, reset, pixelCnt, lineCnt, charRGB, bgRGB, flashClk
         else
           reqCol   <= 1'b0;
     end
-	 
+   
     assign readEn = reqCol && reqRow;
 
     always @ ( posedge clock or posedge reset ) begin

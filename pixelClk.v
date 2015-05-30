@@ -1,31 +1,33 @@
-/*----- Module Overview ---------------------------------------*
-*                                                              *
-*                      _______________                         *
-*                                                              *
-*                     |               |                        * 
-*  clock  ------->    |               |                        * 
-*  reset    ------->  |   pixelClk    |  ------->  clockMod4   *
-*                     |               |                        * 
-*                      _______________                         *
-*                                                              *
-*                                                              *
-*        _   _   _   _   _   _   _   _   _   _   _             *
-*      _| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_           *
-*                                                              *
-*                _______________                 ___           *
-*      _________|               |_______________|              *
-*                                                              *
-*                                                              *
-*--------------------------------------------------------------*/
-module mod4 ( clock, reset, clockMod4 );
+/*----- Module Overview -------------------------------------*
+*                                                            *
+*                    _______________                         *
+*                                                            *
+*                   |               |                        * 
+*  clock  ------->  |               |                        * 
+*  reset  ------->  |   pixelClk    |  ------->  clockMod4   *
+*                   |               |                        * 
+*                    _______________                         *
+*                                                            *
+*                                                            *
+*        _   _   _   _   _   _   _   _   _   _   _           *
+*      _| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_| |_         *
+*                                                            *
+*                _______________                 ___         *
+*      _________|               |_______________|            *
+*                                                            *
+*                                                            *
+*------------------------------------------------------------*/
 
-  input           clock;
-  input           reset;
+module pixelClk ( clock, reset, outClk );
 
-  reg     [1:0]   cnt; /* 2 bit register */
+  input            clock;
+  input            reset;
 
-  output          clockMod4;
-  
+  wire             clockMod4;
+  reg     [1:0]    cnt; /* 2 bit register */
+
+  output           outClk;
+
   assign clockMod4 = ( cnt == 2'd3 ); /* We count at range 0-3 */
 
   always @ ( posedge clock or posedge reset )
@@ -34,26 +36,10 @@ module mod4 ( clock, reset, clockMod4 );
     else 
       cnt <= cnt + 1;
 
-endmodule
-
-module pixelClk ( clock, reset, outClk );
-
-  input           clock;
-  input           reset;
-
-  wire            clockMod4;
-
-  output       outClk;
-
-  mod4  i0  ( clock, reset, clockMod4 );
-/*
   always @ ( posedge clockMod4 or posedge reset )
     if ( reset ) 
       outClk <= 0; 
     else 
       outClk <= ~outClk;
-*/
-assign outClk = clockMod4;
 
 endmodule
-

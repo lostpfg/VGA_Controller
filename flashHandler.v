@@ -1,12 +1,12 @@
 /*----- Module Overview ---------------------------------------*
 *                                                              *
-*                      ____________                            *
+*                      _______________                         *
 *                                                              *
 *                     |               |                        * 
 *  clock  ------->    |               |                        * 
 *  enable ------->    | flashHandler  |  ------->  rgbDepth    *
 *                     |               |                        * 
-*                      ____________                            *
+*                      _______________                         *
 *                                                              *
 *--------------------------------------------------------------*/
 module flashHandler ( clock, reset, enable, flashClk );
@@ -15,9 +15,9 @@ module flashHandler ( clock, reset, enable, flashClk );
   input           clock;
   input           enable;
 
-  wire				flashCnt;
+  wire		      flashCnt;
 
-  output reg 	      flashClk;
+  output reg 	  flashClk;
   
   flashClk i0 ( reset, clock, flashCnt );
   

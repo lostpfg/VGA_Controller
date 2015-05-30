@@ -29,7 +29,6 @@ module  dispController  ( clock,
                           vgaVsync
                         );
 								
-		
   input                   clock;
   input                   reset;
   input                   flashClk;

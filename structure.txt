@@ -1,8 +1,6 @@
 +--- topModule
     |
     +--- pixelClk   
-    |   |
-    |   +--- cnt3
     |
     +--- kbdController
     |   |

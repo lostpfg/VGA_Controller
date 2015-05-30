@@ -16,14 +16,14 @@ module  romController ( reset, enable, inNum, addrOffset, outByte ) ;
 
   input                   reset;
   input                   enable;
-  input       [3:0]       addrOffset;
-  input		  [2:0]		  inNum;
+  input          [3:0]    addrOffset;
+  input          [2:0]    inNum;
   
-  wire        [5:0]       reqAdrr;
-  wire 		  [7:0]	     reqByte;
-  output reg  [7:0] 	     outByte;
-	
-  assign  readEn = enable && ( ~inNum[2] ) ;
+  wire           [5:0]    reqAdrr;
+  wire           [7:0]    reqByte;
+  output  reg    [7:0]    outByte;
+  
+  assign  readEn = ( ~inNum[2] ) && enable;
   assign  reqAdrr = { inNum[1:0], addrOffset };
   
   charRom charByte ( reqAdrr, reqByte );
@@ -33,5 +33,5 @@ module  romController ( reset, enable, inNum, addrOffset, outByte ) ;
       outByte <= 8'h00;
     else
       outByte <= reqByte;
-		
+    
 endmodule

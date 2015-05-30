@@ -11,8 +11,8 @@
 
 module ps2Decode ( ps2InCode, ps2OutCode  );
 
-  input       [7:0]   ps2InCode;
-  output      [3:0]   ps2OutCode;
+  input     [7:0]    ps2InCode;
+  output    [3:0]    ps2OutCode;
 
   assign  ps2OutCode  = ( ps2InCode == 8'h16 ) ? 4'h0 :          /* 1 */
                         ( ps2InCode == 8'h1E ) ? 4'h1 :          /* 2 */
