@@ -28,13 +28,13 @@ module inputDecode ( clock , reset, inCode, userNum, charSize, charRGB, bgRGB, c
   output                  flashClk;
   
   reg                     enFlash;
-  reg                     enBkgrd;
-  reg            [2:0]    outColor;
+  reg                     enBg;
+  reg            [2:0]    userColor;
   
   initial 
     begin
       charSize    <= 3'h1; /* Initialize Character size to 1 */
-      userNum     <= 3'h4; /* Initialize to {1,00}={number pressed, number} */
+      userNum     <= 3'h4; /* Initialize to {1,00}={number pressed flag, offset at Character ROM} */
     end
 
   /* Detect codes relevant to number input */
@@ -53,26 +53,26 @@ module inputDecode ( clock , reset, inCode, userNum, charSize, charRGB, bgRGB, c
 
   always @ ( posedge clock or posedge reset ) begin
       if ( reset )
-        outColor  <= 3'h0;
+        userColor  <= 3'h0;
       else
         case ( inCode )
-          4'h4    : outColor  <= 3'h1;  /* Enable R */
-          4'h5    : outColor  <= 3'h2;  /* Enable G */
-          4'h6    : outColor  <= 3'h4;  /* Enable B */
-          default : outColor  <= 3'h0;  /* Clear all flags */
+          4'h4    : userColor  <= 3'h1;  /* Enable R */
+          4'h5    : userColor  <= 3'h2;  /* Enable G */
+          4'h6    : userColor  <= 3'h4;  /* Enable B */
+          default : userColor  <= 3'h0;  /* Clear all flags */
         endcase
   end
 
   always @ ( posedge clock or posedge reset ) begin
       if ( reset )
-          enBkgrd <= 1'b0;
+          enBg <= 1'b0;
       else
         case ( inCode )
-          4'hD : enBkgrd  <= ~enBkgrd;
+          4'hD : enBg  <= ~enBg;
         endcase
   end
 
-  colorHandler i0 ( reset, enBkgrd, outColor, charRGB, bgRGB );
+  colorHandler i0 ( reset, enBg, userColor, charRGB, bgRGB );
 
   /* Detect Codes relevant to character position */
 
@@ -83,8 +83,8 @@ module inputDecode ( clock , reset, inCode, userNum, charSize, charRGB, bgRGB, c
         case ( inCode )
           4'h7    : charOffset  <= 4'h1;  /* Enable Up */
           4'h8    : charOffset  <= 4'h2;  /* Enable Down */
-          4'h9    : charOffset  <= 4'h4;  /* Enable left */
-          4'hA    : charOffset  <= 4'h8;  /* Enable left */
+          4'h9    : charOffset  <= 4'h4;  /* Enable Left */
+          4'hA    : charOffset  <= 4'h8;  /* Enable Right */
           default : charOffset  <= 4'h0;  /* Clear all flags */
         endcase
   end

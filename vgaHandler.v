@@ -33,11 +33,11 @@ module vgaHandler ( clock, reset, hSync, pixelCnt, vSync, lineCnt, compBlank  );
 
     /* ---- Horizontal Pixel (Synchronous) Counter ----------------------- *
     *   The horizontal counter increases by one when is exclusively        *
-    *   less than (  Horizontal Total ), otherwise it resets to zero.      *
+    *   less than the Horizontal Total time, otherwise it resets to zero.  *
     *----------------------------------------------------------------------*/
     
     always @ ( posedge clock or posedge reset ) begin
-        if ( reset ) /* On reset set pixel counter to 0 */
+        if ( reset ) /* On reset clear counter */
             pixelCnt <= 10'd0;
         else if (  pixelCnt == ( `HDR + `HFP + `HSP + `HBP ) - 1 ) /* Reached the last pixel in line, so reset the counter */
             pixelCnt <= 10'd0;
@@ -48,11 +48,11 @@ module vgaHandler ( clock, reset, hSync, pixelCnt, vSync, lineCnt, compBlank  );
     /* ---- Vertical Line (Synchronous) Counter -------------------------- *
     *   The vertical counter increases by one when the horizontal counter  *
     *   resets to zero and the vertical counter is exclusively less than   *
-    *   ( Vretical Total ), otherwise it resets to zero.                   *
+    *   Vretical Total display time, otherwise it resets to zero.          *
     *----------------------------------------------------------------------*/
 
     always @ ( posedge clock or posedge reset ) begin
-        if ( reset ) /* On reset set line counter to 0 */
+        if ( reset ) /* On reset clear counter */
             lineCnt <= 9'd0;
         else if ( (  lineCnt == ( `VDR + `VFP + `VSP + `VBP )  - 1 ) && (  pixelCnt == ( `HDR + `HFP + `HSP + `HBP ) - 1 ) ) /* Reached the last pixel of the line and the whole frame, so reset the counter */
             lineCnt <= 9'd0;
@@ -60,14 +60,14 @@ module vgaHandler ( clock, reset, hSync, pixelCnt, vSync, lineCnt, compBlank  );
             lineCnt <=  lineCnt + 1;
     end
 
-    /* ---- Horizontal Sync Signal Generator -------------------------- *
-    *   The horizontal sync signal should be low when it's counter is   * 
-    *   exclusively less than ( `HDR + `HFP + `HSP ) and greater than or   *
-    *   equal to ( `HDR + `HFP), when others it is high.                  *
-    *-------------------------------------------------------------------*/
+    /* ---- Horizontal Sync Signal Generator ---------------------------- *
+    *   The horizontal sync signal should be low when it's counter is     * 
+    *   exclusively less than ( `HDR + `HFP + `HSP ) and greater than or  *
+    *   equal to ( `HDR + `HFP ), when others it is high.                 *
+    *---------------------------------------------------------------------*/
 
     always @ ( posedge clock or posedge reset ) begin
-        if ( reset ) /* Disable Syncing */
+        if ( reset ) /* On reset clear Horizontal Syncing signal */
             hSync <= ~HPL;
         else if ( pixelCnt == ( `HDR + `HFP ) - 1 ) /* Enable Syncing after Front Porch & Display Time */
             hSync <= HPL;
@@ -75,18 +75,18 @@ module vgaHandler ( clock, reset, hSync, pixelCnt, vSync, lineCnt, compBlank  );
             hSync <= ~HPL;
     end
 
-    /* ---- Vertical Sync Signal Generator ---------------------------- *
-    *   The vertical sync signal should be high when it's counter is    * 
-    *   exclusively less than ( `VDR+ `VFP + `VSP ) and greater than or    *
+    /* ---- Vertical Sync Signal Generator ------------------------------ *
+    *   The vertical sync signal should be high when it's counter is      * 
+    *   exclusively less than ( `VDR+ `VFP + `VSP ) and greater than or   *
     *   equal to ( `VDR + `VFP), when others it is low.                   *
-    *-------------------------------------------------------------------*/
+    *---------------------------------------------------------------------*/
 
     always @ ( posedge clock or posedge reset ) begin
-        if ( reset )
+        if ( reset ) /* On reset clear Vertical Syncing signal */
             vSync = ~`VPL;
-        else if ( lineCnt == ( `VDR + `VFP ) - 1 ) 
+        else if ( lineCnt == ( `VDR + `VFP ) - 1 ) /* Enable Syncing after Front Porch & Display Time */
             vSync = `VPL;
-        else if ( lineCnt == ( `VDR + `VFP + `VSP ) - 1  )
+        else if ( lineCnt == ( `VDR + `VFP + `VSP ) - 1  )  /* Disable Syncing otherwise */
             vSync = ~`VPL;
     end
     
@@ -99,9 +99,9 @@ module vgaHandler ( clock, reset, hSync, pixelCnt, vSync, lineCnt, compBlank  );
     always @ ( posedge clock or posedge reset ) begin
         if ( reset )
             hBlank <= 1'b0;
-        else if ( pixelCnt == `HDR - 1 ) /* Outside Display Region */
+        else if ( pixelCnt == `HDR - 1 ) /* Outside Horizontal Display Region */
             hBlank <= ~hBlank;
-        else if ( pixelCnt == ( `HDR + `HFP + `HSP + `HBP ) - 1 )
+        else if ( pixelCnt == ( `HDR + `HFP + `HSP + `HBP ) - 1 ) /* Inside Horizal Display Region */
             hBlank <= ~hBlank;
     end
 
@@ -114,15 +114,15 @@ module vgaHandler ( clock, reset, hSync, pixelCnt, vSync, lineCnt, compBlank  );
     always @ ( posedge clock or posedge reset ) begin
         if ( reset )
             vBlank <= 1'b0;
-        else if ( lineCnt == `VDR - 1 ) /* Outside Display Region */
+        else if ( lineCnt == `VDR - 1 ) /* Outside Vertical Display Region */
             vBlank <= ~vBlank;
-        else if ( lineCnt == ( `VDR + `VFP + `VSP + `VBP ) - 1 )
+        else if ( lineCnt == ( `VDR + `VFP + `VSP + `VBP ) - 1 ) /* Inside Vertical Display Region */
             vBlank <= ~vBlank;
     end
 
     /* ---- Composite Blanking Signal Generator ------------------------------------*
     *   The Composite blanking singal should be high either when the Horizontal     *
-    *   or Vertical signal are high respectively. Otherwise it is seted to low      *
+    *   or Vertical signal are high respectively. Otherwise it is low               *
     *-------------------------------------------------------------------------------*/
 
     assign compBlank = ( hBlank || vBlank );

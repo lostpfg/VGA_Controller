@@ -52,7 +52,7 @@ module  charHandler  (  clock,
     input            [8:0]       posHorStart;
     input            [8:0]       posHorEnd;
    
-    output reg       [8:0]       vgaRGB;       /* ......  */
+    output reg       [8:0]       vgaRGB;       /* !!! Posibly no need to be a Reg !!!  */
     output                       readEn;       /* ......  */
     output reg       [3:0]       rowCnt;       /* Counter of lines in active Region */
     output reg       [2:0]       colCnt;       /* Counter of pixels in active Region */

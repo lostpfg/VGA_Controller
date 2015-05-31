@@ -21,4 +21,4 @@
 
 /* --- Vertical Total Time = ( VDR + VFP + VSP + VBP ) = 449 --------------*/
 
-`define CHM 4;     /* Character Magnify */
+`define CHM 1;     /* Character Magnify */

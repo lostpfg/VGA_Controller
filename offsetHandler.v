@@ -19,9 +19,9 @@
 
 module  offsetHandler  ( reset, charSize, OffsetFlag, posVerStart, posVerEnd , posHorStart, posHorEnd );
  
-    input                      reset;
-    input             [2:0]    charSize;     /* Defines size of character  */
-    input             [3:0]    OffsetFlag;   /* Defines offset increament { Left, Right, Up, Down }  */
+    input                reset;
+    input       [2:0]    charSize;     /* Defines size of character  */
+    input       [3:0]    OffsetFlag;   /* Defines offset increament { Right, Left, Down, Up }  */
 
     reg         [8:0]    horOffset;
     reg         [8:0]    verOffset;
@@ -47,7 +47,19 @@ module  offsetHandler  ( reset, charSize, OffsetFlag, posVerStart, posVerEnd , p
       posHorEnd   <= ( ( `HDR - `HAL*`CHM )/2 ) + ( `HAL*`CHM - 1 );
     end
 
-  always @ ( posedge OffsetFlag[3] )
+  always @ ( posedge OffsetFlag[0] )
+    if ( posVerStart >= `VAL*`CHM + 1 ) /* Character Vertical Start Offset can shift without beading */
+      begin
+        posVerStart <= posVerStart - `VAL*`CHM; 
+        posVerEnd   <= ( posVerEnd >= `VAL*`CHM + 1 ) ? ( posVerEnd - `VAL*`CHM ) :  ( `VDR - `VAL*`CHM + posVerEnd );
+      end
+    else /* Shift Character Vertical Start Offset to down edge */
+      begin
+        posVerStart <= `VDR - `VAL*`CHM + posVerStart;
+        posVerEnd   <= ( posVerEnd == `VAL*`CHM ) ? `VDR : ( posVerEnd - `VAL*`CHM );
+      end   
+
+  always @ ( posedge OffsetFlag[2] )
     if ( posHorStart >= `HAL*`CHM + 1 ) /* Character Horizontal Start Offset can shift without beading */
       begin
         posHorStart <= posHorStart - `HAL*`CHM; 
@@ -59,16 +71,6 @@ module  offsetHandler  ( reset, charSize, OffsetFlag, posVerStart, posVerEnd , p
         posHorEnd   <= ( posHorEnd == `HAL*`CHM ) ? `HDR : ( posHorEnd - `HAL*`CHM );
       end
 
-  always @ ( posedge OffsetFlag[1] )
-    if ( posHorStart >= `VAL*`CHM + 1 ) /* Character Vertical Start Offset can shift without beading */
-      begin
-        posHorStart <= posHorStart - `VAL*`CHM; 
-        posHorEnd   <= ( posHorEnd >= `VAL*`CHM + 1 ) ? ( posHorEnd - `VAL*`CHM ) :  ( `VDR - `VAL*`CHM + posHorEnd );
-      end
-    else /* Shift Character Vertical Start Offset to down edge */
-      begin
-        posHorStart <= `VDR - `VAL*`CHM + posHorStart;
-        posHorEnd   <= ( posHorEnd == `VAL*`CHM ) ? `VDR : ( posHorEnd - `VAL*`CHM );
-      end   
+
 
 endmodule
