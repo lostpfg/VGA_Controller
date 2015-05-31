@@ -68,16 +68,28 @@ module  charHandler  (  clock,
             colCnt  <= 3'd0;
             colEn   <= 1'b0;
           end
-        else if ( pixelCnt == posHorEnd ) /* Reached the last pixel of Active Region, so reset the counter */
-          begin
-            colCnt  <= 3'd0;
-            colEn   <= 1'b0;
-          end
-        else if ( ( pixelCnt >= ( posHorStart - 1 ) ) && ( pixelCnt <= ( posHorEnd - 1 ) ) )/* Did not reach the pixel line, so increase the counter */
-          begin
-            colCnt  <=  pixelCnt - ( posHorStart - 1 );
-            colEn   <=  1'b1;
-          end
+        else if ( posHorStart < posHorEnd ) /* Displayed region is inside Active region bound */
+          if ( pixelCnt == posHorEnd ) /* Reached the last pixel of Active Region, so reset the counter */
+            begin
+              colCnt  <= 3'd0;
+              colEn   <= 1'b0;
+            end
+          else if ( ( pixelCnt >= ( posHorStart - 1 ) ) && ( pixelCnt <= ( posHorEnd - 1 ) ) )/* Did not reach the pixel line, so increase the counter */
+            begin
+              colCnt  <=  pixelCnt - ( posHorStart - 1 );
+              colEn   <=  1'b1;
+            end
+        else /* Displayed region needs beading */
+          if ( pixelCnt == posHorStart ) /* Reached the last pixel of Active Region, so reset the counter */
+            begin
+              colCnt  <= 3'd0;
+              colEn   <= 1'b0;
+            end
+          else if ( ( pixelCnt <= posHorEnd - 1 ) || ( pixelCnt >= posHorStart - 1 ) )/* Did not reach the pixel line, so increase the counter */
+            begin
+              colCnt  <=  ( pixelCnt <= posHorEnd - 1 ) ? ( pixelCnt - ( posHorStart + 1 ) ) : ( pixelCnt - ( posHorStart - 1 ) ) ;
+              colEn   <=  1'b1;
+            end
     end
 
     always @ ( posedge clock or posedge reset ) begin
@@ -86,16 +98,28 @@ module  charHandler  (  clock,
             rowCnt  <= 4'd0;
             rowEn   <= 1'b0;
           end
-        else if ( lineCnt == posVerEnd ) /* Reached the last line of Active Region, so reset the counter */
-          begin
-            rowCnt  <= 4'd0;    /* Clear Counter */
-            rowEn   <= 1'b0;  /* Set Flag to low */
-          end
-        else if ( ( lineCnt >= ( posVerStart -  1 ) ) && ( lineCnt <= ( posVerEnd - 1 ) ) )/* Did not reach the last line, so increase the counter */
-          begin
-            rowCnt  <=  lineCnt - ( posVerStart - 1 );
-            rowEn   <=  1'b1;
-          end
+        else if ( posVerStart < posVerEnd ) /* Displayed region is inside Active region bound */
+          if ( lineCnt == posVerEnd ) /* Reached the last pixel of Active Region, so reset the counter */
+            begin
+              rowCnt  <= 4'd0;
+              rowEn   <= 1'b0;
+            end
+          else if ( ( lineCnt >= ( posVerStart - 1 ) ) && ( lineCnt <= ( posVerEnd - 1 ) ) )/* Did not reach the pixel line, so increase the counter */
+            begin
+              rowCnt  <=  lineCnt - ( posVerStart - 1 );
+              rowEn   <=  1'b1;
+            end
+        else /* Displayed region needs beading */
+          if ( lineCnt == posVerStart ) /* Reached the last pixel of Active Region, so reset the counter */
+            begin
+              rowCnt  <= 4'd0;
+              rowEn   <= 1'b0;
+            end
+          else if ( ( lineCnt <= posVerEnd - 1 ) || ( lineCnt >= posVerStart - 1 ) )/* Did not reach the pixel line, so increase the counter */
+            begin
+              rowCnt  <=  ( lineCnt <= posVerEnd - 1 ) ? ( lineCnt - ( posVerStart + 1 ) ) : ( lineCnt - ( posVerStart - 1 ) ) ;
+              rowEn   <=  1'b1;
+            end
     end
 
     always @ ( posedge clock or posedge reset ) begin

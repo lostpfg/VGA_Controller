@@ -15,6 +15,8 @@
 *                                                                       *
 *-----------------------------------------------------------------------*/
 
+`include "globalVariables.v"
+
 module  offsetHandler  ( reset, charSize, OffsetFlag, posVerStart, posVerEnd , posHorStart, posHorEnd );
  
     input                      reset;
@@ -26,45 +28,47 @@ module  offsetHandler  ( reset, charSize, OffsetFlag, posVerStart, posVerEnd , p
 
     output      [8:0]    posVerStart;  
     output      [8:0]    posVerEnd;
-    output      [8:0]    posHorStart;  /* [-6,640] */
-    output      [8:0]    posHorEnd;    /* [2,648] */
+    output      [8:0]    posHorStart;  /* [0,640] */
+    output      [8:0]    posHorEnd;    /* [0,640] */
 
-  /* Active Display Region -- Center of the Screen @ sizeof 16x8 */
-
-  localparam HDR = 640;  /* Horizontal Display Region */
-  localparam HAL = 8;    /* Horizontal Active Region Lenght */
-
-  localparam VDR = 400;   /* Vertical Display Region */
-  localparam VAL = 16;    /* Vertical Active Region Lenght */
-  
-  localparam CHM = 1;     /* Character Magnify */
-  
   initial 
     begin
-      posVerStart <= ( ( VDR - VAL*CHM )/2 );
-      posVerEnd   <= ( ( VDR - VAL*CHM )/2 ) + ( VAL*CHM - 1 );
-      posHorStart <= ( ( HDR - HAL*CHM )/2 );
-      posHorEnd   <= ( ( HDR - HAL*CHM )/2 ) + ( HAL*CHM - 1 );
+      posVerStart <= ( ( `VDR - `VAL*`CHM )/2 );
+      posVerEnd   <= ( ( `VDR - `VAL*`CHM )/2 ) + ( `VAL*`CHM - 1 );
+      posHorStart <= ( ( `HDR - `HAL*`CHM )/2 );
+      posHorEnd   <= ( ( `HDR - `HAL*`CHM )/2 ) + ( `HAL*`CHM - 1 );
     end
 
   always @ ( posedge reset )
     begin
-      posVerStart <= ( ( VDR - VAL*CHM )/2 );
-      posVerEnd   <= ( ( VDR - VAL*CHM )/2 ) + ( VAL*CHM - 1 );
-      posHorStart <= ( ( HDR - HAL*CHM )/2 );
-      posHorEnd   <= ( ( HDR - HAL*CHM )/2 ) + ( HAL*CHM - 1 );
+      posVerStart <= ( ( `VDR - `VAL*`CHM )/2 );
+      posVerEnd   <= ( ( `VDR - `VAL*`CHM )/2 ) + ( `VAL*`CHM - 1 );
+      posHorStart <= ( ( `HDR - `HAL*`CHM )/2 );
+      posHorEnd   <= ( ( `HDR - `HAL*`CHM )/2 ) + ( `HAL*`CHM - 1 );
     end
 
-  always @ ( posedge OffsetFlag[0] )
-    if ( posHorStart >= HAL*CHM + 1 ) /* Character Start can shift without beading */
+  always @ ( posedge OffsetFlag[3] )
+    if ( posHorStart >= `HAL*`CHM + 1 ) /* Character Horizontal Start Offset can shift without beading */
       begin
-        posHorStart <= posHorStart - HAL*CHM; 
-        posHorEnd   <= ( posHorEnd >= HAL*CHM + 1 ) ? posHorEnd - HAL*CHM :  HDR - HAL*CHM + posHorEnd;
+        posHorStart <= posHorStart - `HAL*`CHM; 
+        posHorEnd   <= ( posHorEnd >= `HAL*`CHM + 1 ) ? ( posHorEnd - `HAL*`CHM ) : ( `HDR - `HAL*`CHM + posHorEnd );
       end
-    else /* Shift Character Start to right edge */
+    else /* Shift Character Horizontal Start Offset to right edge */
       begin
-        posHorStart <= HDR - HAL*CHM + posHorStart;
-        posHorEnd   <= ( posHorEnd == HAL*CHM ) ? HDR : posHorEnd - HAL*CHM );
+        posHorStart <= `HDR - `HAL*`CHM + posHorStart;
+        posHorEnd   <= ( posHorEnd == `HAL*`CHM ) ? `HDR : ( posHorEnd - `HAL*`CHM );
       end
-     
+
+  always @ ( posedge OffsetFlag[1] )
+    if ( posHorStart >= `VAL*`CHM + 1 ) /* Character Vertical Start Offset can shift without beading */
+      begin
+        posHorStart <= posHorStart - `VAL*`CHM; 
+        posHorEnd   <= ( posHorEnd >= `VAL*`CHM + 1 ) ? ( posHorEnd - `VAL*`CHM ) :  ( `VDR - `VAL*`CHM + posHorEnd );
+      end
+    else /* Shift Character Vertical Start Offset to down edge */
+      begin
+        posHorStart <= `VDR - `VAL*`CHM + posHorStart;
+        posHorEnd   <= ( posHorEnd == `VAL*`CHM ) ? `VDR : ( posHorEnd - `VAL*`CHM );
+      end   
+
 endmodule

@@ -15,6 +15,8 @@
 *                                                                       *
 *-----------------------------------------------------------------------*/
 
+`include "globalVariables.v"
+
 module vgaHandler ( clock, reset, hSync, pixelCnt, vSync, lineCnt, compBlank  );
 
     input                   clock;
@@ -28,30 +30,6 @@ module vgaHandler ( clock, reset, hSync, pixelCnt, vSync, lineCnt, compBlank  );
     output  reg    [9:0]    pixelCnt;           /* Counter of pixels in a line */
     output  reg    [8:0]    lineCnt;            /* Counter of lines in a frame */
     output                  compBlank;          /* Tracks Composite Blanking Signal */
-    
-
-
-    /*----- Timing Table of Horizontal and Vertical Signals ---------------*
-    *   Both the Horizontal and Vertical syncing signals capture the same  *
-    *   timing model, the only difference being the lengths of theirs      *
-    *   pulse width, front porch, back porch, display time, etc.           *
-    *----------------------------------------------------------------------*/
-
-    localparam HDR = 640;   /* Horizontal Display Region */
-    localparam HFP = 16;    /* Horizontal Front Porch */
-    localparam HSP = 96;    /* Horizontal Syncing Pulse (Retrace) */
-    localparam HBP = 48;    /* Horizontal Back Porch */
-    localparam HPL = 0;     /* Horizontal Sync Polarity */
-
-    /* --- Horizontal Total Time = ( HDR + HFP + HSP + HBP ) = 800 ------------*/
-
-    localparam VDR = 400;   /* Vertical Display Region */
-    localparam VFP = 12;    /* Vertical Front Porch */
-    localparam VSP = 2;     /* Vertical Syncing Pulse (Retrace) */
-    localparam VBP = 35;    /* Vertical Back Porch */
-    localparam VPL = 1;     /* Vertical Sync Polarity */
-
-    /* --- Vertical Total Time = ( VDR + VFP + VSP + VBP ) = 449 --------------*/
 
     /* ---- Horizontal Pixel (Synchronous) Counter ----------------------- *
     *   The horizontal counter increases by one when is exclusively        *
@@ -61,7 +39,7 @@ module vgaHandler ( clock, reset, hSync, pixelCnt, vSync, lineCnt, compBlank  );
     always @ ( posedge clock or posedge reset ) begin
         if ( reset ) /* On reset set pixel counter to 0 */
             pixelCnt <= 10'd0;
-        else if (  pixelCnt == ( HDR + HFP + HSP + HBP ) - 1 ) /* Reached the last pixel in line, so reset the counter */
+        else if (  pixelCnt == ( `HDR + `HFP + `HSP + `HBP ) - 1 ) /* Reached the last pixel in line, so reset the counter */
             pixelCnt <= 10'd0;
         else /* Did not reach the last pixel, so increase the counter */
             pixelCnt <=  pixelCnt + 1;
@@ -76,40 +54,40 @@ module vgaHandler ( clock, reset, hSync, pixelCnt, vSync, lineCnt, compBlank  );
     always @ ( posedge clock or posedge reset ) begin
         if ( reset ) /* On reset set line counter to 0 */
             lineCnt <= 9'd0;
-        else if ( (  lineCnt == ( VDR + VFP + VSP + VBP )  - 1 ) && (  pixelCnt == ( HDR + HFP + HSP + HBP ) - 1 ) ) /* Reached the last pixel of the line and the whole frame, so reset the counter */
+        else if ( (  lineCnt == ( `VDR + `VFP + `VSP + `VBP )  - 1 ) && (  pixelCnt == ( `HDR + `HFP + `HSP + `HBP ) - 1 ) ) /* Reached the last pixel of the line and the whole frame, so reset the counter */
             lineCnt <= 9'd0;
-        else if (  pixelCnt == ( HDR + HFP + HSP + HBP )  - 1 ) /* Reached last pixel but not in last line, so increase the counter */
+        else if (  pixelCnt == ( `HDR + `HFP + `HSP + `HBP )  - 1 ) /* Reached last pixel but not in last line, so increase the counter */
             lineCnt <=  lineCnt + 1;
     end
 
     /* ---- Horizontal Sync Signal Generator -------------------------- *
     *   The horizontal sync signal should be low when it's counter is   * 
-    *   exclusively less than ( HDR + HFP + HSP ) and greater than or   *
-    *   equal to ( HDR + HFP), when others it is high.                  *
+    *   exclusively less than ( `HDR + `HFP + `HSP ) and greater than or   *
+    *   equal to ( `HDR + `HFP), when others it is high.                  *
     *-------------------------------------------------------------------*/
 
     always @ ( posedge clock or posedge reset ) begin
         if ( reset ) /* Disable Syncing */
             hSync <= ~HPL;
-        else if ( pixelCnt == ( HDR + HFP ) - 1 ) /* Enable Syncing after Front Porch & Display Time */
+        else if ( pixelCnt == ( `HDR + `HFP ) - 1 ) /* Enable Syncing after Front Porch & Display Time */
             hSync <= HPL;
-        else if ( pixelCnt == ( HDR + HFP + HSP ) - 1 ) /* Disable Syncing otherwise */
+        else if ( pixelCnt == ( `HDR + `HFP + `HSP ) - 1 ) /* Disable Syncing otherwise */
             hSync <= ~HPL;
     end
 
     /* ---- Vertical Sync Signal Generator ---------------------------- *
     *   The vertical sync signal should be high when it's counter is    * 
-    *   exclusively less than ( VDR+ VFP + VSP ) and greater than or    *
-    *   equal to ( VDR + VFP), when others it is low.                   *
+    *   exclusively less than ( `VDR+ `VFP + `VSP ) and greater than or    *
+    *   equal to ( `VDR + `VFP), when others it is low.                   *
     *-------------------------------------------------------------------*/
 
     always @ ( posedge clock or posedge reset ) begin
         if ( reset )
-            vSync = ~VPL;
-        else if ( lineCnt == ( VDR + VFP ) - 1 ) 
-            vSync = VPL;
-        else if ( lineCnt == ( VDR + VFP + VSP ) - 1  )
-            vSync = ~VPL;
+            vSync = ~`VPL;
+        else if ( lineCnt == ( `VDR + `VFP ) - 1 ) 
+            vSync = `VPL;
+        else if ( lineCnt == ( `VDR + `VFP + `VSP ) - 1  )
+            vSync = ~`VPL;
     end
     
     /* ---- Horizontal Blanking Signal Generator ----------------------------*
@@ -121,24 +99,24 @@ module vgaHandler ( clock, reset, hSync, pixelCnt, vSync, lineCnt, compBlank  );
     always @ ( posedge clock or posedge reset ) begin
         if ( reset )
             hBlank <= 1'b0;
-        else if ( pixelCnt == HDR - 1 ) /* Outside Display Region */
+        else if ( pixelCnt == `HDR - 1 ) /* Outside Display Region */
             hBlank <= ~hBlank;
-        else if ( pixelCnt == ( HDR + HFP + HSP + HBP ) - 1 )
+        else if ( pixelCnt == ( `HDR + `HFP + `HSP + `HBP ) - 1 )
             hBlank <= ~hBlank;
     end
 
     /* ---- Horizontal Blanking Signal Generator ----------------------------*
     *   The Vertical blanking singal should be high when it's counter is     *
-    *   exclusively less than ( VDR ) and must be seted to low after the     *
+    *   exclusively less than ( `VDR ) and must be seted to low after the     *
     *   ( Vretical Total ) time.                                             *
     *------------------------------------------------------------------------*/
 
     always @ ( posedge clock or posedge reset ) begin
         if ( reset )
             vBlank <= 1'b0;
-        else if ( lineCnt == VDR - 1 ) /* Outside Display Region */
+        else if ( lineCnt == `VDR - 1 ) /* Outside Display Region */
             vBlank <= ~vBlank;
-        else if ( lineCnt == ( VDR + VFP + VSP + VBP ) - 1 )
+        else if ( lineCnt == ( `VDR + `VFP + `VSP + `VBP ) - 1 )
             vBlank <= ~vBlank;
     end
 
