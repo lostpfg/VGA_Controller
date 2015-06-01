@@ -71,6 +71,4 @@ module  offsetHandler  ( reset, charSize, OffsetFlag, posVerStart, posVerEnd , p
         posHorEnd   <= ( posHorEnd == `HAL*`CHM ) ? `HDR : ( posHorEnd - `HAL*`CHM );
       end
 
-
-
 endmodule

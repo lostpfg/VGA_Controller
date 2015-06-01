@@ -74,7 +74,7 @@ module  charHandler  (  clock,
               colCnt  <= 3'd0;
               colEn   <= 1'b0;
             end
-          else if ( ( pixelCnt >= ( posHorStart - 1 ) ) && ( pixelCnt <= ( posHorEnd - 1 ) ) )/* Did not reach the pixel line, so increase the counter */
+          else if ( ( pixelCnt >= ( posHorStart - 1 ) ) && ( pixelCnt <= ( posHorEnd - 1 ) ) ) /* Did not reach the pixel line, so increase the counter */
             begin
               colCnt  <=  pixelCnt - ( posHorStart - 1 );
               colEn   <=  1'b1;
@@ -125,7 +125,7 @@ module  charHandler  (  clock,
     always @ ( posedge clock or posedge reset ) begin
         if ( reset )
           reqRow   <= 1'b0;
-        else if ( lineCnt == ( posVerEnd - 2 ) )
+        else if ( lineCnt == ( posVerStart - 1 ) )
           reqRow   <= 1'b0;
         else if ( lineCnt == ( posVerStart - 2 ) )
           reqRow   <= 1'b1;
@@ -135,9 +135,9 @@ module  charHandler  (  clock,
         if ( reset )
           reqCol   <= 1'b0;
         else if ( pixelCnt == ( posHorStart - 2 ) )
-          reqCol   <= 1'b1;
-        else
-          reqCol   <= 1'b0;
+          reqCol   <= ~reqCol;
+        else if ( pixelCnt == ( posHorStart - 1 ) )
+          reqCol   <= ~reqCol;
     end
    
     assign readEn = reqCol && reqRow;
