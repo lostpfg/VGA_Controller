@@ -106,9 +106,9 @@ module vgaHandler ( clock, reset, hSync, pixelCnt, vSync, lineCnt, compBlank  );
     always @ ( posedge clock or posedge reset ) begin
         if ( reset )
             vSync = ~VPL;
-        else if ( lineCnt == ( VDT + VFP ) - 1 ) 
+        else if ( ( lineCnt == ( VDT + VFP ) - 1 ) && ( pixel_count == ( HDT + HFP + HSP + HBP ) - 1 ) )
             vSync = VPL;
-        else if ( lineCnt == ( VDT + VFP + VSP ) - 1  )
+        else if ( ( lineCnt == ( VDT + VFP + VSP ) - 1 ) && ( pixel_count == ( HDT + HFP + HSP + HBP ) - 1 ) )
             vSync = ~VPL;
     end
     

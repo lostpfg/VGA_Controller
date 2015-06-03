@@ -70,7 +70,7 @@ module  offsetHandler  ( reset, charSize, OffsetFlag, posVerStart, posVerEnd , p
         /* Character Horizontal Start Offset can shift left without beading */
         begin
           posHorStart <= posHorStart - `HAL*`CHM; 
-          posHorEnd   <= posHorEnd - `HAL*`CHM;
+          posHorEnd   <= ( posHorEnd <= `HAL*`CHM )  ? (`HDR - ( `HAL*`CHM - posHorEnd ) ) : posHorEnd - `HAL*`CHM;
         end
       else /* Shift Character Horizontal Start Offset to right edge */
         begin
