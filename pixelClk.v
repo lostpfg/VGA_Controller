@@ -26,7 +26,7 @@ module pixelClk ( clock, reset, outClk );
   wire             clockMod4;
   reg     [1:0]    cnt; /* 2 bit register */
 
-  output           outClk;
+  output  reg      outClk;
 
   assign clockMod4 = ( cnt == 2'd3 ); /* We count at range 0-3 */
 

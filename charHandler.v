@@ -21,30 +21,31 @@
 
 `include "globalVariables.v"
 
-module  charHandler  ( clock, reset, pixelCnt, lineCnt, charRGB, bgRGB, flashClk, posVerStart, posVerEnd , posHorStart,posHorEnd, bitDisp, readEn, rowCnt, colCnt, vgaRGB );
+
+module  charHandler  ( clock, reset, pixelCnt, lineCnt, charRgbDepth, bkRgbDepth, flashClk, posVerStart, posVerEnd , posHorStart,posHorEnd, bitDisp, readEn, rowCnt, colCnt, vgaRGB );
 
     input                     clock;
     input                     reset;
     input                     flashClk;     /* Tracks the flash clock edge */
     input         [9:0]       pixelCnt;     /* Counter of pixels in a line of the active region */
     input         [8:0]       lineCnt;      /* Counter of lines in a frame of active region */
-    input         [8:0]       charRGB;      /* Tracks the depth of each Color of the drawable object */
-    input         [8:0]       bgRGB;        /* Tracks the depth of each Color of the background */
+    input         [8:0]       charRgbDepth; /* Tracks the depth of each Color of the drawable object */
+    input         [8:0]       bkRgbDepth;   /* Tracks the depth of each Color of the background */
     input                     bitDisp;      /* Tracks wether a bit of the drawable object is displayed or not */
-    input         [8:0]       posVerStart;
-    input         [8:0]       posVerEnd;
-    input         [9:0]       posHorStart;
-    input         [9:0]       posHorEnd;
-    
-    reg                       colEn;        /* ......  */
+    input   		[8:0]       posVerStart;
+    input  	 		[8:0]       posVerEnd;
+    input   	   [9:0]       posHorStart;
+    input	      [9:0]       posHorEnd;
+    reg      	               colEn;        /* ......  */
     reg                       rowEn;        /* ......  */
     reg                       reqRow;       /* ......  */
     reg                       reqCol;       /* ......  */
-   
+	 
     output reg    [8:0]       vgaRGB;       /* ......  */
     output                    readEn;       /* ......  */
     output reg    [3:0]       rowCnt;       /* Counter of lines in active Region */
     output reg    [2:0]       colCnt;       /* Counter of pixels in active Region */
+  
 
     always @ ( posedge clock or posedge reset ) begin
         if ( reset )
@@ -67,18 +68,16 @@ module  charHandler  ( clock, reset, pixelCnt, lineCnt, charRGB, bgRGB, flashClk
         end
        else
       begin
-       if ( lineCnt == posVerEnd || lineCnt == 400 - 1 ) /* Reached the last pixel of Active Region, so reset the counter */
-            begin
-          if ( lineCnt == 400 - 1 )
-          rowCnt  <= 4'd0;
+          if ( lineCnt == posVerEnd || lineCnt == `VDR ) /* Reached the last pixel of Active Region, so reset the counter */
               rowEn   <= 1'b0;
-            end
-          else if ( ( lineCnt <= posVerEnd - 1 ) || ( lineCnt >= posVerStart - 1 ) )
+          else if ( ( pixelCnt <= posVerEnd - 1 ) || ( lineCnt >= posVerStart - 1 ) )/* Did not reach the pixel line, so increase the counter */
             begin
-              rowCnt  <=  ( lineCnt <= posVerEnd - 1 ) ? ( lineCnt - ( posVerStart + 1 ) ) : ( lineCnt - ( posVerStart - 1 ) ) ;
+              rowCnt  <=  ( lineCnt <= posVerEnd - 1 ) ? ( `VDR - posVerEnd + lineCnt ) : ( lineCnt - ( posVerStart - 1 ) ) ;
               rowEn   <=  1'b1;
             end
-      end
+          if ( pixelCnt == `VDR )
+                rowCnt  <= 4'd0;
+        end
     end
     
     always @ ( posedge clock or posedge reset ) begin
@@ -102,17 +101,15 @@ module  charHandler  ( clock, reset, pixelCnt, lineCnt, charRGB, bgRGB, flashClk
         end
       else /* Displayed region needs beading */
         begin
-          if ( pixelCnt == posHorEnd || pixelCnt == `HDR - 1 ) /* Reached the last pixel of Active Region, so reset the counter */
-            begin
+          if ( pixelCnt == posHorEnd || pixelCnt == `HDR ) /* Reached the last pixel of Active Region, so reset the counter */
               colEn   <= 1'b0;
-              if ( pixelCnt == `HDR - 1 )
-                colCnt  <= 3'd0;
-            end
           else if ( ( pixelCnt <= posHorEnd - 1 ) || ( pixelCnt >= posHorStart - 1 ) )/* Did not reach the pixel line, so increase the counter */
             begin
               colCnt  <=  ( pixelCnt <= posHorEnd - 1 ) ? ( `HDR - posHorEnd + pixelCnt ) : ( pixelCnt - ( posHorStart - 1 ) ) ;
               colEn   <=  1'b1;
             end
+          if ( pixelCnt == `HDR )
+                colCnt  <= 3'd0;
         end
     end
 
@@ -147,7 +144,7 @@ module  charHandler  ( clock, reset, pixelCnt, lineCnt, charRGB, bgRGB, flashClk
     always @ ( posedge clock or posedge reset ) begin
         if ( reset )
           vgaRGB <=  9'd0; /* Clear RGB Buffer */
-        else if ( rowEn && colEn && bitDisp && ~flashClk* ) /* Inside Active Region and Have a pixel to display */
+        else if ( rowEn && colEn && bitDisp && ~flashClk ) /* Inside Active Region and Have a pixel to display */
           vgaRGB  <= { 3'd7, 3'd0, 3'd7 }; /* Pass each color's depth to output's buffer */
         else 
           vgaRGB <=  { 3'd7, 3'd7, 3'd7 };   /* Outside Display Region everything is black and nothing to display */

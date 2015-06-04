@@ -27,7 +27,7 @@ module vgaHandler ( clock, reset, hSync, pixelCnt, vSync, lineCnt, compBlank  );
     output reg          vSync;              /* Vertical Syncing Signal */
     output reg  [9:0]   pixelCnt;           /* Counter of pixels in a line */
     output reg  [8:0]   lineCnt;            /* Counter of lines in a frame */
-    output              compBlank;          /* Tracks Composite Blanking Signal */
+    output reg		      compBlank;          /* Tracks Composite Blanking Signal */
     
 
 
@@ -106,9 +106,9 @@ module vgaHandler ( clock, reset, hSync, pixelCnt, vSync, lineCnt, compBlank  );
     always @ ( posedge clock or posedge reset ) begin
         if ( reset )
             vSync = ~VPL;
-        else if ( ( lineCnt == ( VDT + VFP ) - 1 ) && ( pixel_count == ( HDT + HFP + HSP + HBP ) - 1 ) )
+        else if ( ( lineCnt == ( VDT + VFP ) - 1 ) && ( pixelCnt == ( HDT + HFP + HSP + HBP ) - 1 ) )
             vSync = VPL;
-        else if ( ( lineCnt == ( VDT + VFP + VSP ) - 1 ) && ( pixel_count == ( HDT + HFP + HSP + HBP ) - 1 ) )
+        else if ( ( lineCnt == ( VDT + VFP + VSP ) - 1 ) && ( pixelCnt == ( HDT + HFP + HSP + HBP ) - 1 ) )
             vSync = ~VPL;
     end
     
@@ -136,9 +136,9 @@ module vgaHandler ( clock, reset, hSync, pixelCnt, vSync, lineCnt, compBlank  );
     always @ ( posedge clock or posedge reset ) begin
         if ( reset )
             vBlank <= 1'b0;
-        else if ( lineCnt == VDT - 1 ) /* Outside Display Region */
+        else if ( ( lineCnt == VDT - 1 ) && ( pixelCnt == HDT - 1 ) )/* Outside Display Region */
             vBlank <= 1'b1;
-        else if ( lineCnt == ( VDT + VFP + VSP + VBP ) - 1 )
+        else if ( ( lineCnt == ( VDT + VFP + VSP + VBP ) - 1 ) && ( pixelCnt == ( HDT + HFP + HSP + HBP ) - 1 ) )
             vBlank <= 1'b0;
     end
 
@@ -147,6 +147,13 @@ module vgaHandler ( clock, reset, hSync, pixelCnt, vSync, lineCnt, compBlank  );
     *   or Vertical signal are high respectively. Otherwise it is seted to low      *
     *-------------------------------------------------------------------------------*/
 
-    assign compBlank = ( hBlank || vBlank );
-
+    always @ ( posedge clock or posedge reset ) begin
+        if ( reset )
+            compBlank <= 1'b0;
+        else if ( vBlank || hBlank ) /* Outside Display Region */
+            compBlank <= 1'b1;
+        else
+            compBlank <= 1'b0;
+    end
+	 
 endmodule

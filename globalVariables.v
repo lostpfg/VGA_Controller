@@ -10,7 +10,7 @@
 `define HSP 96    /* Horizontal Syncing Pulse (Retrace) */
 `define HBP 48    /* Horizontal Back Porch */
 `define HPL 0     /* Horizontal Sync Polarity */
-
+`define HAL 8
 /* --- Horizontal Total Time = ( HDR + HFP + HSP + HBP ) = 800 ------------*/
 
 `define VDR 400   /* Vertical Display Region */
@@ -18,7 +18,7 @@
 `define VSP 2     /* Vertical Syncing Pulse (Retrace) */
 `define VBP 35    /* Vertical Back Porch */
 `define VPL 1     /* Vertical Sync Polarity */
-
+`define VAL 16
 /* --- Vertical Total Time = ( VDR + VFP + VSP + VBP ) = 449 --------------*/
 
 `define CHM 1     /* Character Magnify */
