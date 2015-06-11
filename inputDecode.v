@@ -4,7 +4,7 @@
 *                                                                   *
 *                       |                 |                         * 
 *  clock      ------->  |                 |  --/03-->  userNum      *
-*  reset      ------->  |                 |  --/04-->  charSize     *
+*  reset      ------->  |                 |  --/04-->  movSpeed     *
 *  inCode     --/04-->  |                 |  --/09-->  charRGB      *
 *                       |   inputDecode   |  --/09-->  bgRGB        *
 *                       |                 |  --/04-->  charOffset   *
@@ -14,14 +14,14 @@
 *                                                                   *
 *-------------------------------------------------------------------*/
 
-module inputDecode ( clock , reset, inCode, userNum, charSize, charRGB, bgRGB, charOffset, flashClk );
+module inputDecode ( clock , reset, inCode, userNum, movSpeed, charRGB, bgRGB, charOffset, flashClk );
 
   input                   clock;
   input                   reset;
   input          [3:0]    inCode;
 
   output reg     [2:0]    userNum;
-  output reg     [3:0]    charSize;
+  output reg     [3:0]    movSpeed;
   output         [8:0]    charRGB;
   output         [8:0]    bgRGB;
   output reg     [3:0]    charOffset;
@@ -33,7 +33,7 @@ module inputDecode ( clock , reset, inCode, userNum, charSize, charRGB, bgRGB, c
   
   initial 
     begin
-      charSize    <= 3'h1; /* Initialize Character size to 1 */
+      movSpeed    <= 3'h1; /* Initialize 1 */
       userNum     <= 3'h4; /* Initialize to {1,00}={number pressed flag, offset at Character ROM} */
     end
 
@@ -93,13 +93,11 @@ module inputDecode ( clock , reset, inCode, userNum, charSize, charRGB, bgRGB, c
   
   always @ ( posedge clock or posedge reset ) begin
       if ( reset )
-        begin
-          charSize <= 3'd1;
-        end
+        movSpeed <= 3'd1;
       else
         case ( inCode )
-          4'hB : charSize   <= charSize + 1;
-          4'hC : charSize   <= charSize - 1;
+          4'hB : movSpeed   <= ( movSpeed == 3'd4 ) ? 3'd0 : movSpeed + 1'b1;
+          4'hC : movSpeed   <= ( movSpeed == 3'd1 ) ? 3'd4 : movSpeed - 1'b1;
         endcase
   end
 
@@ -107,9 +105,7 @@ module inputDecode ( clock , reset, inCode, userNum, charSize, charRGB, bgRGB, c
 
   always @ ( posedge clock or posedge reset ) begin
       if ( reset )
-        begin
-          enFlash <= 1'b0;
-        end
+        enFlash <= 1'b0;
       else
         case ( inCode )
           4'hE : enFlash  <= ~enFlash;

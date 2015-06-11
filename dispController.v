@@ -17,12 +17,14 @@
 *                                                                    *
 *--------------------------------------------------------------------*/
 
+`include "globalVariables.v"
+
 module  dispController  ( clock, 
                           reset,
                           charRgbDepth,
                           bkRgbDepth,
                           flashClk,
-                          charSize,
+                          moveSpeed,
                           charOffset,
                           romByte,
                           readEn,
@@ -38,7 +40,7 @@ module  dispController  ( clock,
   input                   flashClk;
   input         [8:0]     charRgbDepth;
   input         [8:0]     bkRgbDepth;
-  input         [3:0]     charSize;
+  input         [3:0]     moveSpeed;
   input         [3:0]     charOffset;
   input         [7:0]     romByte;
 
@@ -61,11 +63,11 @@ module  dispController  ( clock,
   output  reg             vgaHsync;
   output  reg   [8:0]     vgaRGB;
   
-  assign bitDisp = romByte[( `HAL*`CHM - 1 ) - byteOffset];
+  assign bitDisp = romByte[( `HAL - 1 ) - byteOffset];
   
   vgaHandler     i0  ( clock, reset, hSync, pixelCnt, vSync, lineCnt, compBlank );
   charHandler    i1  ( clock, reset, pixelCnt, lineCnt, charRgbDepth, bkRgbDepth, flashClk, posVerStart, posVerEnd , posHorStart, posHorEnd, bitDisp, readEn, addOffset, byteOffset, charRGB );
-  offsetHandler  i2  ( reset, charSize, charOffset, posVerStart, posVerEnd , posHorStart, posHorEnd );
+  offsetHandler  i2  ( reset, moveSpeed, charOffset, posVerStart, posVerEnd , posHorStart, posHorEnd );
 
  always @ ( posedge clock or posedge reset ) begin
     if ( reset ) 
