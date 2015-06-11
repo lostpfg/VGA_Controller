@@ -1,10 +1,9 @@
-/*----- Module Overview --------------------------------------*
+/* ----- Module Overview --------------------------------------*
 *                                                             *
 *                        _______________                      *
 *                                                             *
 *                       |               |                     * 
-*  readEn     ------->  |               | --/08--> outData    *
-*  inAddress  --/06-->  |    charRom    |                     * 
+*  inAddress  --/06-->  |    charRom    | --/08--> outData    *
 *                       |               |                     * 
 *                        _______________                      *
 *                                                             *
@@ -19,28 +18,28 @@ module charRom ( inAddress, outData );
 
     case ( inAddress )
 
-      /* 00h: 1 */
+      /* 00h: 1  */
 
-      6'h00: outData <= 8'h0C; /*     ##  */
-      6'h01: outData <= 8'h1C; /*    ###  */
-      6'h02: outData <= 8'h7C; /*  #####  */
-      6'h03: outData <= 8'hEC; /* ### ##  */
-      6'h04: outData <= 8'h0C; /*     ##  */
-      6'h05: outData <= 8'h0C; /*     ##  */
-      6'h06: outData <= 8'h0C; /*     ##  */
-      6'h07: outData <= 8'h0C; /*     ##  */
-      6'h08: outData <= 8'h0C; /*     ##  */
-      6'h09: outData <= 8'h0C; /*     ##  */
-      6'h0A: outData <= 8'h0C; /*     ##  */
-      6'h0B: outData <= 8'h0C; /*     ##  */
-      6'h0C: outData <= 8'h0C; /*     ##  */
-      6'h0D: outData <= 8'h0C; /*     ##  */
-      6'h0E: outData <= 8'h0C; /*     ##  */
-      6'h0F: outData <= 8'h0C; /*     ##  */
+      6'h00: outData <= 8'h08; /*   ###    */
+      6'h01: outData <= 8'h78; /*  ####    */
+      6'h02: outData <= 8'hF8; /* #####    */
+      6'h03: outData <= 8'hD8; /* ## ##    */
+      6'h04: outData <= 8'h18; /*    ##    */
+      6'h05: outData <= 8'h18; /*    ##    */
+      6'h06: outData <= 8'h18; /*    ##    */
+      6'h07: outData <= 8'h18; /*    ##    */
+      6'h08: outData <= 8'h18; /*    ##    */
+      6'h09: outData <= 8'h18; /*    ##    */
+      6'h0A: outData <= 8'h18; /*    ##    */
+      6'h0B: outData <= 8'h18; /*    ##    */
+      6'h0C: outData <= 8'h08; /*    ##    */
+      6'h0D: outData <= 8'h18; /*    ##    */
+      6'h0E: outData <= 8'hFF; /* ######## */
+      6'h0F: outData <= 8'hFF; /* ######## */
 
-      /* 00h: 2 */
+      /* 00h: 2  */
 
-      6'h10: outData <= 8'h3C; /*   ####   */
+      6'h10: outData <= 8'h7C; /*  #####   */
       6'h11: outData <= 8'hFE; /* #######  */
       6'h12: outData <= 8'hC3; /* ##    ## */
       6'h13: outData <= 8'h03; /*       ## */
@@ -53,11 +52,11 @@ module charRom ( inAddress, outData );
       6'h1A: outData <= 8'h60; /*  ##      */
       6'h1B: outData <= 8'hC0; /* ##       */
       6'h1C: outData <= 8'hC0; /* ##       */
-      6'h1D: outData <= 8'hC0; /* ##       */
+      6'h1D: outData <= 8'hC3; /* ##    ## */
       6'h1E: outData <= 8'hFF; /* ######## */
       6'h1F: outData <= 8'hFF; /* ######## */
 
-      /* 00h: 3 */
+      /* 00h: 3  */
    
       6'h20: outData <= 8'h3C; /*   ####   */
       6'h21: outData <= 8'h7E; /*  ######  */
@@ -76,26 +75,27 @@ module charRom ( inAddress, outData );
       6'h2E: outData <= 8'h7E; /*  ######  */
       6'h2F: outData <= 8'h3C; /*   ####   */
 
-      /* 00h: 4 */
+      /* 00h: 4  */
 
-      6'h30: outData <= 8'h1E; /*    ####  */
-      6'h31: outData <= 8'h3E; /*   #####  */ 
-      6'h32: outData <= 8'h66; /*  ##  ##  */ 
-      6'h33: outData <= 8'hC6; /* ##   ##  */ 
+      6'h30: outData <= 8'h0E; /*     ###  */
+      6'h31: outData <= 8'h1E; /*    ####  */ 
+      6'h32: outData <= 8'h36; /*   ## ##  */ 
+      6'h33: outData <= 8'h66; /*  ##  ##  */ 
       6'h34: outData <= 8'hC6; /* ##   ##  */ 
       6'h35: outData <= 8'hC6; /* ##   ##  */ 
-      6'h36: outData <= 8'hC6; /* ##   ##  */ 
+      6'h36: outData <= 8'hFF; /* ######## */ 
       6'h37: outData <= 8'hFF; /* ######## */
-      6'h38: outData <= 8'hFF; /* ######## */
-      6'h39: outData <= 8'h06; /*      ##  */  
-      6'h3A: outData <= 8'h06; /*      ##  */  
-      6'h3B: outData <= 8'h06; /*      ##  */  
-      6'h3C: outData <= 8'h06; /*      ##  */  
-      6'h3D: outData <= 8'h06; /*      ##  */  
-      6'h3E: outData <= 8'h06; /*      ##  */ 
-      6'h3F: outData <= 8'h06; /*      ##  */ 
+      6'h38: outData <= 8'hF6; /*      ##  */
+      6'h39: outData <= 8'h06; /*      ##  */ 
+      6'h3A: outData <= 8'h06; /*      ##  */ 
+      6'h3B: outData <= 8'h06; /*      ##  */ 
+      6'h3C: outData <= 8'h06; /*      ##  */ 
+      6'h3D: outData <= 8'h06; /*      ##  */ 
+      6'h3E: outData <= 8'h06; /*      ##  */
+      6'h3F: outData <= 8'h06; /*      ##  */
 
     endcase
                                   
   end
+  
 endmodule

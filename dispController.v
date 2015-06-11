@@ -20,8 +20,8 @@
 module  dispController  ( clock, 
                           reset,
                           charRgbDepth,
-								  bkRgbDepth,
-								  flashClk,
+                          bkRgbDepth,
+                          flashClk,
                           charSize,
                           charOffset,
                           romByte,
@@ -31,15 +31,15 @@ module  dispController  ( clock,
                           vgaHsync, 
                           vgaVsync
                         );
-								
-		
+                
+    
   input                   clock;
   input                   reset;
   input                   flashClk;
   input         [8:0]     charRgbDepth;
   input         [8:0]     bkRgbDepth;
   input         [3:0]     charSize;
-  input         [3:0] 	  charOffset;
+  input         [3:0]     charOffset;
   input         [7:0]     romByte;
 
   wire                    bitDisp;
@@ -48,41 +48,34 @@ module  dispController  ( clock,
   wire          [9:0]     pixelCnt;
   wire          [8:0]     lineCnt;
   wire                    compBlank;
-  wire			 [2:0]     byteOffset;
-  wire 			 [8:0]     charRGB;
-  wire   		 [8:0]     posVerStart;
-  wire  	 		 [8:0]     posVerEnd;
-  wire   	    [9:0]     posHorStart;
-  wire	       [9:0]     posHorEnd;
+  wire          [2:0]     byteOffset;
+  wire          [8:0]     charRGB;
+  wire          [8:0]     posVerStart;
+  wire          [8:0]     posVerEnd;
+  wire          [9:0]     posHorStart;
+  wire          [9:0]     posHorEnd;
   
   output        [3:0]     addOffset;
   output                  readEn;
   output  reg             vgaVsync;
   output  reg             vgaHsync;
   output  reg   [8:0]     vgaRGB;
-	
-  assign bitDisp = romByte[7-byteOffset];
   
-  vgaHandler         i0       ( clock, reset, hSync, pixelCnt, vSync, lineCnt, compBlank );
-  charHandler        i1       ( clock, reset, pixelCnt, lineCnt, charRgbDepth, bkRgbDepth, flashClk, posVerStart, posVerEnd , posHorStart, posHorEnd, bitDisp, readEn, addOffset, byteOffset, charRGB );
-  offsetHandler      i2 		( reset, charSize, charOffset, posVerStart, posVerEnd , posHorStart, posHorEnd );
+  assign bitDisp = romByte[( `HAL*`CHM - 1 ) - byteOffset];
+  
+  vgaHandler     i0  ( clock, reset, hSync, pixelCnt, vSync, lineCnt, compBlank );
+  charHandler    i1  ( clock, reset, pixelCnt, lineCnt, charRgbDepth, bkRgbDepth, flashClk, posVerStart, posVerEnd , posHorStart, posHorEnd, bitDisp, readEn, addOffset, byteOffset, charRGB );
+  offsetHandler  i2  ( reset, charSize, charOffset, posVerStart, posVerEnd , posHorStart, posHorEnd );
 
  always @ ( posedge clock or posedge reset ) begin
     if ( reset ) 
       vgaRGB  <= 9'd0; /* Clear Local Buffer */
-    else 
-      if ( compBlank ) /* Make Screen Black */
-        begin
-          vgaHsync  <=  hSync;
-          vgaVsync  <=  vSync;      
-          vgaRGB    <=  9'd0; /* Clear Local Buffer */
-        end
-      else
-        begin
-          vgaHsync  <=  hSync;
-          vgaVsync  <=  vSync;
-          vgaRGB    <=  charRGB;
-        end
+    else
+      begin
+        vgaHsync  <=  hSync;
+        vgaVsync  <=  vSync;  
+        vgaRGB    <=  ( compBlank ) ? 9'h0 : charRGB;
+      end
   end
 
 endmodule

@@ -1,34 +1,34 @@
-/*----- Module Overview ------------------------------------------------*
-*                                                                       *
-*                         ________________________                      *
-*                                                                       *
-*                        |                        |                     * 
-*  reset       ------->  |                        |                     * 
-*  charSize    ------->  |                        | -------> readEn     *
-*  OffsetFlag  --/04-->  |                        | -------> rowCnt     *
-*                        |      offsetHandler     | -------> colCnt     * 
-*                        |                        | --/09--> vgaRGB     *
-*                        |                        |                     *
-*                        |                        |                     *  
-*                         ________________________                      *
-*                                                                       *
-*                                                                       *
-*-----------------------------------------------------------------------*/
+/*----- Module Overview -------------------------------------------------*
+*                                                                        *
+*                         ________________________                       *
+*                                                                        *
+*                        |                        |                      * 
+*  reset       ------->  |                        | --/09-- posVerStart  *
+*  charSize    ------->  |                        | --/09-- posVerEnd    *
+*  OffsetFlag  --/04-->  |      offsetHandler     | --/10-- posHorStart  * 
+*                        |                        | --/10--> posHorEnd   *
+*                        |                        |                      *
+*                         ________________________                       *
+*                                                                        *
+*                                                                        *
+*------------------------------------------------------------------------*/
 
 `include "globalVariables.v"
 
 module  offsetHandler  ( reset, charSize, OffsetFlag, posVerStart, posVerEnd , posHorStart, posHorEnd );
  
-    input                reset;
-    input       [2:0]    charSize;     /* Defines size of character  */
-    input       [3:0]    OffsetFlag;   /* Defines offset increament { Right, Left, Down, Up }  */
-   
-    output  reg    [8:0]    posVerStart;  
-    output  reg    [8:0]    posVerEnd;
-    output  reg    [9:0]    posHorStart;  /* [0,640] */
-    output  reg    [9:0]    posHorEnd;    /* [0,640] */
+  input                   reset;
+  input          [2:0]    charSize;     /* Defines size of character  */
+  input          [3:0]    OffsetFlag;   /* Defines offset increament { Right, Left, Down, Up }  */
+ 
+  output  reg    [8:0]    posVerStart;  
+  output  reg    [8:0]    posVerEnd;
+  output  reg    [9:0]    posHorStart;  /* [0,640] */
+  output  reg    [9:0]    posHorEnd;    /* [0,640] */
 
-  /* Initialize Drawable Region to the Center of the Active one */
+
+  /* Initialize Drawable Region at the center of the Active Region of the Screen */
+
   initial 
     begin
       posVerStart <= ( ( `VDR - `VAL*`CHM )/2 );
@@ -43,7 +43,7 @@ module  offsetHandler  ( reset, charSize, OffsetFlag, posVerStart, posVerEnd , p
       posVerStart <= ( ( `VDR - `VAL*`CHM )/2 );
       posVerEnd   <= ( ( `VDR - `VAL*`CHM )/2 ) + ( `VAL*`CHM - 1 );
     end
-  else if ( posedge OffsetFlag[2] ) /* Drawable Region moves up */
+  else if ( OffsetFlag[0] ) /* Drawable Region moves up */
     begin
       if ( posVerStart >= `VAL*`CHM + 1 ) 
         begin
@@ -74,7 +74,7 @@ module  offsetHandler  ( reset, charSize, OffsetFlag, posVerStart, posVerEnd , p
       posHorStart <= ( ( `HDR - `HAL*`CHM )/2 );
       posVerEnd   <= ( ( `HDR - `HAL*`CHM )/2 ) + ( `HAL*`CHM - 1 );
     end
-  else if ( posedge OffsetFlag[2] ) /* Drawable Region moves left */
+  else if ( OffsetFlag[2] ) /* Drawable Region moves left */
     begin
       if ( posHorStart >= `HAL*`CHM + 1 ) 
         begin
@@ -88,15 +88,17 @@ module  offsetHandler  ( reset, charSize, OffsetFlag, posVerStart, posVerEnd , p
         end
     end
   else /* Drawable Region moves right */
-   if ( posHorStart <= `HDR - `HAL*`CHM ) 
-      begin
-         posHorStart <= posHorStart + `HAL*`CHM; 
-         posHorEnd   <= ( posHorEnd >= `HDR - `HAL*`CHM ) ? ( `HAL*`CHM - ( `HDR - posHorEnd ) ) : posHorEnd + `HAL*`CHM;
-      end
-    else
-      begin
-         posHorStart <=  `HAL*`CHM - ( `HDR - posHorStart ) ;
-         posHorEnd   <= ( posHorEnd == `HDR ) ? `HAL*`CHM : ( posHorEnd + `HAL*`CHM );
-      end
+    begin
+      if ( posHorStart <= `HDR - `HAL*`CHM ) 
+        begin
+          posHorStart <= posHorStart + `HAL*`CHM; 
+          posHorEnd   <= ( posHorEnd >= `HDR - `HAL*`CHM ) ? ( `HAL*`CHM - `HDR + posHorEnd ) : posHorEnd + `HAL*`CHM;
+        end
+      else
+        begin
+          posHorStart <=  `HAL*`CHM - ( `HDR - posHorStart ) ;
+          posHorEnd   <= ( posHorEnd == `HDR ) ? `HAL*`CHM : ( posHorEnd + `HAL*`CHM );
+        end
+    end
 
 endmodule
