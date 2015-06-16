@@ -2,11 +2,12 @@
 *                                                             *
 *                      _________________                      *
 *                                                             *
-*                     |                 |                     * 
+*                     |                 |                     *
 *  clock    ------->  |                 | --/09--> vgaRGB     *
-*  ps2Clk   ------->  |    topModule    | -------> vgaVsync   *
-*  reset    ------->  |                 | -------> vgaHsync   *
-*  ps2Data  ------->  |                 |                     * 
+*  reset    ------->  |    topModule    | -------> vgaVsync   *
+*  ps2Clk   ------->  |                 | -------> vgaHsync   *
+*  ps2Data  ------->  |                 |                     *
+*                     |                 |                     *
 *                      _________________                      *
 *                                                             *
 *-------------------------------------------------------------*/
@@ -22,7 +23,7 @@ module topModule ( clock, reset, ps2Clk, ps2Data, vgaRGB, vgaHsync, vgaVsync );
   wire    [3:0]   opCode;
   wire    [3:0]   lowAddrOffset;
   wire    [7:0]   romByte;
-  wire    [2:0]   highAddrOffset;  /* Tracks user Number input from keyboard */
+  wire    [2:0]   highAddrOffset;
   wire    [2:0]   moveSpeed;
   wire    [3:0]   charOffset; 
   wire    [8:0]   charRGB;
@@ -38,6 +39,6 @@ module topModule ( clock, reset, ps2Clk, ps2Data, vgaRGB, vgaHsync, vgaVsync );
   kbdController     i1  ( pixelClk, reset, ps2Clk, ps2Data, opCode );
   inputDecode       i2  ( pixelClk, reset, opCode, highAddrOffset, moveSpeed, charRGB, bgRGB, charOffset, flashClk );
   dispController    i3  ( pixelClk, reset, charRGB, bgRGB, flashClk, moveSpeed, charOffset, romByte, readEn, lowAddrOffset, vgaRGB, vgaHsync, vgaVsync );
-  romController     i4  ( reset, readEn, highAddrOffset, lowAddrOffset, romByte ) ; 
+  romController     i4  ( pixelClk, reset, readEn, highAddrOffset, lowAddrOffset, romByte ) ; 
 
 endmodule

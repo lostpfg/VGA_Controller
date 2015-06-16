@@ -12,7 +12,7 @@
 *                                                                               *
 *-------------------------------------------------------------------------------*/
 
-module  romController ( reset, enable, highAddrOffset, lowAddrOffset, outByte ) ; 
+module  romController ( clock, reset, enable, highAddrOffset, lowAddrOffset, outByte ) ; 
 
   input                   reset;
   input                   enable;
@@ -28,10 +28,10 @@ module  romController ( reset, enable, highAddrOffset, lowAddrOffset, outByte ) 
   
   charRom charByte ( reqAdrr, reqByte );
   
-  always @ ( posedge readEn or posedge reset )
-    if ( reset ) /* Clear Ram Data */
+  always @ ( posedge clock or posedge reset )
+    if ( reset )
       outByte <= 8'h00;
-    else
+    else if ( readEn )
       outByte <= reqByte;
     
 endmodule

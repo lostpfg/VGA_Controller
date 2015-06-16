@@ -1,35 +1,35 @@
-/*----- Module Overview --------------------------------------------------*
-*                                                                         *
-*                         ________________________                        *
-*                                                                         *
-*                        |                        |                       * 
-*  reset       ------->  |                        | --/09--> posVerStart  *
-*  offsetFlag  --/04-->  |                        | --/09--> posVerEnd    *
-*  offsetStep  ------->  |      offsetHandler     | --/10--> posHorStart  * 
-*                        |                        | --/10--> posHorEnd    *
-*                        |                        |                       *
-*                         ________________________                        *
-*                                                                         *
-*                                                                         *
-*-------------------------------------------------------------------------*/
+/*----- Module Overview -----------------------------------------------------*
+*                                                                            *
+*                            ________________________                        *
+*                                                                            *
+*                           |                        |                       *
+*  clock          ------->  |                        |                       * 
+*  reset          ------->  |                        | --/09--> posVerStart  *
+*  moveDirection  --/04-->  |     offsetHandler      | --/09--> posVerEnd    *
+*  movemoveStep   --/03-->  |                        | --/10--> posHorStart  * 
+*                           |                        | --/10--> posHorEnd    *
+*                           |                        |                       *
+*                            ________________________                        *
+*                                                                            *
+*                                                                            *
+*----------------------------------------------------------------------------*/
+   
+`include "globalVariables.v   "
 
-`include "globalVariables.v"
-
-module  offsetHandler  ( reset, offsetStep, offsetFlag, posVerStart, posVerEnd , posHorStart, posHorEnd );
- 
+module  offsetHandler  ( clock, reset, movemoveStep , moveDirection, posVerStart, posVerEnd , posHorStart, posHorEnd );
+    
+  input                   clock;   
   input                   reset;
-  input          [3:0]    offsetFlag;   /* Defines offset increament { Right, Left, Down, Up }  */
-  input          [3:0]    offsetStep;   /* Defines moving speed (default 1*CharDim)  */
- 
-  output  reg    [8:0]    posVerStart;  
+  input          [3:0]    moveDirection;   /* Defines offset increament { Right, Left, Down, Up }  */
+  input          [3:0]    movemoveStep;    /* Defines moving speed (default 1*CharDim)  */
+
+  output  reg    [8:0]    posVerStart;
   output  reg    [8:0]    posVerEnd;
-  output  reg    [9:0]    posHorStart;  /* [0,640] */
-  output  reg    [9:0]    posHorEnd;    /* [0,640] */
+  output  reg    [9:0]    posHorStart;
+  output  reg    [9:0]    posHorEnd;
 
 
-  /* Initialize Drawable Region at the center of the Active Region of the Screen */
-
-  initial 
+initial 
     begin
       posVerStart <= ( ( `VDR - `VAL )/2 );
       posVerEnd   <= ( ( `VDR - `VAL )/2 ) + ( `VAL - 1 );
@@ -37,7 +37,7 @@ module  offsetHandler  ( reset, offsetStep, offsetFlag, posVerStart, posVerEnd ,
       posHorEnd   <= ( ( `HDR - `HAL )/2 ) + ( `HAL - 1 );
     end
 
-  always @ ( posedge offsetFlag[0] or posedge offsetFlag[1] or posedge reset )
+  always @ ( posedge clock or posedge reset )
    if ( reset )
     begin /* Reset to Center */ 
       posVerStart <= ( ( `VDR - `VAL )/2 );
@@ -56,7 +56,7 @@ module  offsetHandler  ( reset, offsetStep, offsetFlag, posVerStart, posVerEnd ,
            posVerEnd   <= ( posVerEnd == `VAL*offsetStep ) ? `VDR : ( posVerEnd - `VAL*offsetStep );
         end
     end
-  else /* Drawable Region moves down */
+  else if ( offsetFlag[1] ) /* Drawable Region moves down */
    if ( posVerStart <= `VDR - `VAL*offsetStep ) 
       begin
          posVerStart <= posVerStart + `VAL*offsetStep; 
@@ -68,26 +68,26 @@ module  offsetHandler  ( reset, offsetStep, offsetFlag, posVerStart, posVerEnd ,
          posVerEnd   <= ( posVerEnd == `VDR ) ? `VAL*offsetStep : ( posVerEnd + `VAL*offsetStep );
       end
 
-  always @ ( posedge offsetFlag[2] or posedge offsetFlag[3] or posedge reset )
+  always @ ( posedge clock or posedge reset )
    if ( reset )
     begin /* Reset to Center */ 
       posHorStart <= ( ( `HDR - `HAL )/2 );
-      posVerEnd   <= ( ( `HDR - `HAL )/2 ) + ( `HAL - 1 );
+      posHorEnd   <= ( ( `HDR - `HAL )/2 ) + ( `HAL - 1 );
     end
   else if ( offsetFlag[2] ) /* Drawable Region moves left */
     begin
       if ( posHorStart >= `HAL*offsetStep + 1 ) 
         begin
            posHorStart <= posHorStart - `HAL*offsetStep; 
-           posVerEnd   <= ( posVerEnd > `HAL*offsetStep - 1 ) ? ( posVerEnd - `HAL*offsetStep ): ( `HDR - `HAL*offsetStep + posVerEnd );
+           posHorEnd   <= ( posHorEnd > `HAL*offsetStep - 1 ) ? ( posHorEnd - `HAL*offsetStep ): ( `HDR - `HAL*offsetStep + posHorEnd );
         end
       else
         begin
            posHorStart <= `HDR - `HAL*offsetStep + posHorStart;
-           posVerEnd   <= ( posVerEnd == `HAL*offsetStep ) ? `HDR : ( posVerEnd - `HAL*offsetStep );
+           posHorEnd   <= ( posHorEnd == `HAL*offsetStep ) ? `HDR : ( posHorEnd - `HAL*offsetStep );
         end
     end
-  else /* Drawable Region moves right */
+  else if ( offsetFlag[3] )/* Drawable Region moves right */
     begin
       if ( posHorStart <= `HDR - `HAL*offsetStep ) 
         begin

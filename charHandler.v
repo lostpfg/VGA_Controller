@@ -77,7 +77,7 @@ module  charHandler  ( clock, reset, pixelCnt, lineCnt, charRGB, bgRGB, flashClk
               rowEn   <=  1'b1;
             end
           if ( pixelCnt == `VDR )
-                rowCnt  <= 4'd0;
+            rowCnt  <= 4'd0;
         end
     end
     

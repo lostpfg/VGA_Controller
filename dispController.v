@@ -67,11 +67,11 @@ module  dispController  ( clock,
   
   vgaHandler     i0  ( clock, reset, hSync, pixelCnt, vSync, lineCnt, compBlank );
   charHandler    i1  ( clock, reset, pixelCnt, lineCnt, charRgbDepth, bkRgbDepth, flashClk, posVerStart, posVerEnd , posHorStart, posHorEnd, bitDisp, readEn, addOffset, byteOffset, charRGB );
-  offsetHandler  i2  ( reset, moveSpeed, charOffset, posVerStart, posVerEnd , posHorStart, posHorEnd );
+  offsetHandler  i2  ( clock, reset, moveSpeed, charOffset, posVerStart, posVerEnd , posHorStart, posHorEnd );
 
  always @ ( posedge clock or posedge reset ) begin
     if ( reset ) 
-      vgaRGB  <= 9'd0; /* Clear Local Buffer */
+      vgaRGB  <= 9'd0;
     else
       begin
         vgaHsync  <=  hSync;
