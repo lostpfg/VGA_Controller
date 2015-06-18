@@ -89,7 +89,7 @@ module inputDecode ( clock , reset, inCode, userNum, movSpeed, charRGB, bgRGB, c
         endcase
   end
 
-  /* Detect Code relevant to character magnify */
+  /* Detect Code relevant to character moving speed */
   
   always @ ( posedge clock or posedge reset ) begin
       if ( reset )
@@ -113,6 +113,5 @@ module inputDecode ( clock , reset, inCode, userNum, movSpeed, charRGB, bgRGB, c
   end
   
  flashHandler i1 ( clock, reset, enFlash, flashClk );
-
 
 endmodule

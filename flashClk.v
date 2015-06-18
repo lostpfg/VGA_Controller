@@ -43,6 +43,6 @@ module flashClk ( reset, clk, en_nxt );
 	cnt25 i1 (reset, clk, first, second);
 	cnt25 i2 (reset, clk, first & second, third);
 	cnt64 i4 (reset, clk, first & second & third, fourth);
-	//cnt3b i5 (reset, clk, first & second & third & fourth, clk1Hz);
-	assign en_nxt = first & second & third & fourth /*& clk1Hz*/;
+	cnt4  i5 (reset, clk, first & second & third & fourth, clk1Hz);
+	assign en_nxt = first & second & third & fourth & clk1Hz;
 endmodule

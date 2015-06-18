@@ -4,7 +4,7 @@
 *                                                              *
 *                     |               |                        * 
 *  clock  ------->    |               |                        * 
-*  enable ------->    | flashHandler  |  ------->  rgbDepth    *
+*  enable ------->    | flashHandler  |  ------->  flashClk    *
 *                     |               |                        * 
 *                      _______________                         *
 *                                                              *
