@@ -14,7 +14,7 @@
 *                                                                            *
 *----------------------------------------------------------------------------*/
    
-`include "globalVariables.v   "
+`include "globalVariables.v"
 
 module  offsetHandler  ( clock, reset, movemoveStep , moveDirection, posVerStart, posVerEnd , posHorStart, posHorEnd );
     
@@ -29,76 +29,46 @@ module  offsetHandler  ( clock, reset, movemoveStep , moveDirection, posVerStart
   output  reg    [9:0]    posHorEnd;
 
 
-initial 
+  initial 
     begin
-      posVerStart <= ( ( `VDR - `VAL )/2 );
-      posVerEnd   <= ( ( `VDR - `VAL )/2 ) + ( `VAL - 1 );
-      posHorStart <= ( ( `HDR - `HAL )/2 );
-      posHorEnd   <= ( ( `HDR - `HAL )/2 ) + ( `HAL - 1 );
+      posVerStart = ( ( `VDR - `VAL )/2 );
+      posVerEnd   = posVerStart + ( `VAL - 1 );
+      posHorStart = ( ( `HDR - `HAL )/2 );
+      posHorEnd   = posHorStart + ( `HAL - 1 );
     end
 
   always @ ( posedge clock or posedge reset )
     if ( reset )
       begin /* Reset to Center */ 
-        posVerStart <= ( ( `VDR - `VAL )/2 );
-        posVerEnd   <= ( ( `VDR - `VAL )/2 ) + ( `VAL - 1 );
+        posVerStart = ( ( `VDR - `VAL )/2 );
+        posVerEnd   = ( ( `VDR - `VAL )/2 ) + ( `VAL - 1 );
       end
     else if ( moveDirection[0] ) /* Drawable Region moves up */
       begin
-        if ( posVerStart >= `VAL*movemoveStep + 1 ) 
-          begin
-            posVerStart <= posVerStart - `VAL*movemoveStep; 
-            posVerEnd   <= ( posVerEnd > `VAL*movemoveStep - 1 ) ? ( posVerEnd - `VAL*movemoveStep ): ( `VDR - `VAL*movemoveStep + posVerEnd );
-          end
-        else
-          begin
-            posVerStart <= `VDR - `VAL*movemoveStep + posVerStart;
-            posVerEnd   <= ( posVerEnd == `VAL*movemoveStep ) ? `VDR : ( posVerEnd - `VAL*movemoveStep );
-          end
+        posVerStart = ( posVerStart >= `VAL*movemoveStep + 1 ) ? ( posVerStart - `VAL*movemoveStep ) : ( `VDR - `VAL*movemoveStep + posVerStart ); 
+        posVerEnd   = ( posVerEnd > `VAL*movemoveStep - 1 ) ? ( posVerEnd - `VAL*movemoveStep ) : ( posVerStart + `VAL - 1 );
       end
-    else if ( moveDirection[1] ) /* Drawable Region moves down */
-      if ( posVerStart <= `VDR - `VAL*movemoveStep ) 
-        begin
-          posVerStart <= posVerStart + `VAL*movemoveStep; 
-          posVerEnd   <= ( posVerEnd >= `VDR - `VAL*movemoveStep + 1 ) ? ( `VAL*movemoveStep - ( `VDR - posVerEnd ) ) : posVerEnd + `VAL*movemoveStep;
-        end
-      else
-        begin
-          posVerStart <=  `VAL*movemoveStep - ( `VDR - posVerStart ) ;
-          posVerEnd   <= ( posVerEnd == `VDR ) ? `VAL*movemoveStep : ( posVerEnd + `VAL*movemoveStep );
-        end
+    else if ( moveDirection[1] )/* Drawable Region moves down */
+      begin
+        posVerStart = ( posVerStart <= `VDR - `VAL*movemoveStep ) ? ( posVerStart + `VAL*movemoveStep ) : ( `VAL*movemoveStep - VDR + posVerStart );
+        posVerEnd   = ( posVerEnd >=  `VDR - VAL*movemoveStep + 1 ) ? ( `VAL*movemoveStep - `VDR + posVerEnd ) : posVerStart + `VAL - 1;
+      end
 
   always @ ( posedge clock or posedge reset )
     if ( reset )
       begin /* Reset to Center */ 
-        posHorStart <= ( ( `HDR - `HAL )/2 );
-        posHorEnd   <= ( ( `HDR - `HAL )/2 ) + ( `HAL - 1 );
+        posHorStart = ( ( `HDR - `HAL )/2 );
+        posHorEnd   = ( ( `HDR - `HAL )/2 ) + ( `HAL - 1 );
       end
     else if ( moveDirection[2] ) /* Drawable Region moves left */
       begin
-        if ( posHorStart >= `HAL*movemoveStep + 1 ) 
-          begin
-            posHorStart <= posHorStart - `HAL*movemoveStep; 
-            posHorEnd   <= ( posHorEnd > `HAL*movemoveStep - 1 ) ? ( posHorEnd - `HAL*movemoveStep ): ( `HDR - `HAL*movemoveStep + posHorEnd );
-          end
-        else
-          begin
-            posHorStart <= `HDR - `HAL*movemoveStep + posHorStart;
-            posHorEnd   <= ( posHorEnd == `HAL*movemoveStep ) ? `HDR : ( posHorEnd - `HAL*movemoveStep );
-          end
+        posHorStart = ( posHorStart >= `HAL*movemoveStep + 1 ) ? ( posHorStart - `HAL*movemoveStep ) : ( `HDR - `HAL*movemoveStep + posHorStart ); 
+        posHorEnd   = ( posHorEnd > `HAL*movemoveStep - 1 ) ? ( posHorEnd - `HAL*movemoveStep ) : ( posHorStart + `HAL - 1 );
       end
     else if ( moveDirection[3] )/* Drawable Region moves right */
       begin
-        if ( posHorStart <= `HDR - `HAL*movemoveStep ) 
-          begin
-            posHorStart <= posHorStart + `HAL*movemoveStep; 
-            posHorEnd   <= ( posHorEnd >= `HDR - `HAL*movemoveStep + 1 ) ? ( `HAL*movemoveStep - `HDR + posHorEnd ) : ( posHorEnd + `HAL*movemoveStep );
-          end
-        else
-          begin
-            posHorStart <=  `HAL*movemoveStep - ( `HDR - posHorStart ) ;
-            posHorEnd   <= ( posHorEnd == `HDR ) ? `HAL*movemoveStep : ( posHorEnd + `HAL*movemoveStep );
-          end
+        posHorStart = ( posHorStart <= `HDR - `HAL*movemoveStep ) ? ( posHorStart + `HAL*movemoveStep ) : ( `HAL*movemoveStep - HDR + posHorStart );
+        posHorEnd   = ( posHorEnd >=  `HDR - HAL*movemoveStep + 1 ) ? ( `HAL*movemoveStep - `HDR + posHorEnd ) : posHorStart + `HAL - 1;
       end
 
 endmodule
