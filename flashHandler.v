@@ -4,7 +4,7 @@
 *                                                              *
 *                     |               |                        * 
 *  clock  ------->    |               |                        * 
-*  enable ------->    | flashHandler  |  ------->  flashClk    *
+*  enable ------->    | flashHandler  |  ------->  rgbDepth    *
 *                     |               |                        * 
 *                      _______________                         *
 *                                                              *
@@ -17,11 +17,12 @@ module flashHandler ( clock, reset, enable, flashClk );
 
   wire		      flashCnt;
 
-  output reg 	  flashClk;
+  output reg 	   flashClk;
   
   flashClk i0 ( reset, clock, flashCnt );
   
-  always @ ( posedge flashCnt )
-	flashClk <= enable && ( ~flashClk );
+  always @ ( posedge clock )
+	if ( flashCnt )
+		flashClk <= enable && ( ~flashClk );
 
 endmodule

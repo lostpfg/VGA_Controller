@@ -49,35 +49,32 @@ module  charHandler  ( clock, reset, pixelCnt, lineCnt, charRGB, bgRGB, flashClk
   
 
     always @ ( posedge clock or posedge reset ) begin
-        if ( reset )
-          begin
-            rowCnt  <= 4'd0;
-            rowEn   <= 1'b0;
-          end
-        else if ( posVerStart < posVerEnd )
-         begin
-          if ( lineCnt == posVerEnd ) 
-           begin
-            rowCnt  <= 4'd0;    
-            rowEn   <= 1'b0;  
-           end
-          else if ( ( lineCnt >= ( posVerStart -  1 ) ) && ( lineCnt <= ( posVerEnd - 1 ) ) )
-           begin
-            rowCnt  <=  lineCnt - ( posVerStart - 1 );
-            rowEn   <=  1'b1;
-           end
-        end
-       else
+      if ( reset )
         begin
-          if ( lineCnt == posVerEnd || lineCnt == `VDR ) /* Reached the last pixel of Active Region, so reset the counter */
-              rowEn   <= 1'b0;
-          else if ( ( pixelCnt <= posVerEnd - 1 ) || ( lineCnt >= posVerStart - 1 ) )/* Did not reach the pixel line, so increase the counter */
+          rowCnt  <= 4'd0;
+          rowEn   <= 1'b0;
+        end
+      else if  ( lineCnt == posVerEnd || lineCnt == `VDR )
+        rowEn   <= 1'b0;
+      else if ( posVerStart < posVerEnd ) /* Displayed region is inside Active region bound */
+        begin
+          if ( lineCnt == posVerEnd ) /* Reached the last pixel of Active Region, so reset the counter */
+            rowCnt  <= 4'd0;
+          else if ( ( lineCnt >= posVerStart - 1 ) && ( lineCnt <= posVerEnd - 1 ) ) /* Did not reach the pixel line, so increase the counter */
+            begin
+              rowCnt  <=  lineCnt - ( posVerStart - 1 );
+              rowEn   <=  1'b1;
+            end
+        end
+      else /* Displayed region needs beading */
+        begin
+          if ( lineCnt == `VDR )
+            rowCnt  <= 4'd0;
+          else if ( ( lineCnt <= posVerEnd - 1 ) || ( lineCnt >= posVerStart - 1 ) )
             begin
               rowCnt  <=  ( lineCnt <= posVerEnd - 1 ) ? ( `VDR - posVerEnd + lineCnt ) : ( lineCnt - ( posVerStart - 1 ) ) ;
               rowEn   <=  1'b1;
             end
-          if ( pixelCnt == `VDR )
-            rowCnt  <= 4'd0;
         end
     end
     
@@ -112,13 +109,14 @@ module  charHandler  ( clock, reset, pixelCnt, lineCnt, charRGB, bgRGB, flashClk
     end
 
     always @ ( posedge clock or posedge reset ) begin
-      if ( reset )
-        reqRow   <= 1'b0;
-      else if ( posVerStart < posVerEnd )
-        reqRow <= ( lineCnt == posVerStart - 2 ) ? 1'b1 : 1'b0 ;
-      else
-        reqRow <= ( lineCnt == `VDR - 2 ) ? 1'b1 : 1'b0 ;
+        if ( reset )
+          reqRow   <= 1'b0;
+        else if ( lineCnt == posVerEnd )
+          reqRow   <= 1'b0;
+        else if ( lineCnt == ( posVerStart - 2 ) )
+          reqRow   <= 1'b1;
     end
+
 
     always @ ( posedge clock or posedge reset ) begin
       if ( reset )
@@ -135,9 +133,9 @@ module  charHandler  ( clock, reset, pixelCnt, lineCnt, charRGB, bgRGB, flashClk
         if ( reset )
           vgaRGB <=  9'd0; /* Clear RGB Buffer */
         else if ( rowEn && colEn && bitDisp && ~flashClk ) /* Inside Active Region and Have a pixel to display */
-          vgaRGB  <= { 3'd7, 3'd0, 3'd7 }; /* Pass each color's depth to output's buffer */
+          vgaRGB  <= { charRGB[8:6], charRGB[5:3], charRGB[2:0] }; /* Pass each color's depth to output's buffer */
         else 
-          vgaRGB <=  { 3'd7, 3'd7, 3'd7 };   /* Outside Display Region everything is black and nothing to display */
+          vgaRGB <=  { bgRGB[8:6], bgRGB[5:3], bgRGB[2:0] };   /* Outside Display Region everything is black and nothing to display */
     end
 
 endmodule

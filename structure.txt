@@ -1,39 +1,37 @@
-+--- topModule
++--- topModule       (Oloi)
     |
-    +--- pixelClk   
+    +--- pixelClk         (Petros)   
     |
-    +--- kbdController
+    +--- kbdController    (Petros)
     |   |
-    |   +--- kbdHandler 
+    |   +--- kbdHandler   (Ian)
     |   |
-    |   +--- ps2Decode
+    |   +--- ps2Decode    (Ian)
     |
-    +--- inputDecode
-    |    |
-    |    +--- colorController
+    +--- inputDecode  (Katerina)
+    |    | 
+    |    +--- colorHandler (Petros-S)
     |    |    |
-    |    |    +--- UpDownCounter3bit
+    |    |    +--- UpDownCounter3bit  (Petros-S)
     |    |
-    |    +--- flashHandler
+    |    +--- flashHandler   (Petros-S)
     |         |
-    |         +--- flashClk
+    |         +--- flashClk  (Petros-S)
     |             |
     |             +--- cnt64 
     |             |
     |             +--- cnt25 
-    |             |
-    |             +--- cnt4
     |
     +--- dispController
     |   |
-    |   +--- vgaHandler
+    |   +--- vgaHandler     (Katerina)
     |   |
-    |   +--- charController
+    |   +--- charController (Ian) 
     |   |
-    |   +--- offsetHandler
+    |   +--- offsetHandler  (Petros)
     |
-    +--- romController
+    +--- romController    (Katerina)
         |
-        +--- charRom                   
+        +--- charRom      (Katerina)                  
     
    

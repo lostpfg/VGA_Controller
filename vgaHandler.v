@@ -9,9 +9,6 @@
 *                     |                   | -------> compBlank          *
 *                      __________________                               *
 *                                                                       *
-* The vgaHandler module generates the horizontal sync signal, which     *
-* specifies the time to traverse a row, and the vertical sync signal    *
-* which specifies the time to scan an entire frame. Additionaly ...     *
 *                                                                       *
 *-----------------------------------------------------------------------*/
 
@@ -56,7 +53,7 @@ module vgaHandler ( clock, reset, hSync, pixelCnt, vSync, lineCnt, compBlank  );
     always @ ( posedge clock or posedge reset ) begin
         if ( reset ) /* On reset clear pixel counter */
             lineCnt <= 9'd0;
-        else if ( (  lineCnt == ( `VDT + `VFP + `VSP + `VBP )  - 1 ) && (  pixelCnt == ( `HDR + `HFP + `HSP + `HBP ) - 1 ) ) /* Reached the last pixel of the line and the whole frame, so reset the counter */
+        else if ( (  lineCnt == ( `VDR + `VFP + `VSP + `VBP )  - 1 ) && (  pixelCnt == ( `HDR + `HFP + `HSP + `HBP ) - 1 ) ) /* Reached the last pixel of the line and the whole frame, so reset the counter */
             lineCnt <= 9'd0;
         else if (  pixelCnt == ( `HDR + `HFP + `HSP + `HBP )  - 1 ) /* Reached last pixel but not in last line, so increase the counter */
             lineCnt <=  lineCnt + 1;
@@ -70,26 +67,26 @@ module vgaHandler ( clock, reset, hSync, pixelCnt, vSync, lineCnt, compBlank  );
 
     always @ ( posedge clock or posedge reset ) begin
         if ( reset ) /* Disable Syncing */
-            hSync <= ~HPL;
+            hSync <= ~`HPL;
         else if ( pixelCnt == ( `HDR + `HFP ) - 1 ) /* Enable Syncing after Front Porch & Display Time */
-            hSync <= HPL;
+            hSync <= `HPL;
         else if ( pixelCnt == ( `HDR + `HFP + `HSP ) - 1 ) /* Disable Syncing otherwise */
-            hSync <= ~HPL;
+            hSync <= ~`HPL;
     end
 
     /*----- Vertical Sync Signal Generator ---------------------------- *
     *   The vertical sync signal should be high when it's counter is    * 
-    *   exclusively less than ( `VDT+ `VFP + `VSP ) and greater than or    *
-    *   equal to ( `VDT + `VFP), when others it is low.                   *
+    *   exclusively less than ( `VDR+ `VFP + `VSP ) and greater than or    *
+    *   equal to ( `VDR + `VFP), when others it is low.                   *
     *-------------------------------------------------------------------*/
 
     always @ ( posedge clock or posedge reset ) begin
         if ( reset )
-            vSync = ~VPL;
-        else if ( ( lineCnt == ( `VDT + `VFP ) - 1 ) && ( pixelCnt == ( `HDR + `HFP + `HSP + `HBP ) - 1 ) )
-            vSync = VPL;
-        else if ( ( lineCnt == ( `VDT + `VFP + `VSP ) - 1 ) && ( pixelCnt == ( `HDR + `HFP + `HSP + `HBP ) - 1 ) )
-            vSync = ~VPL;
+            vSync = ~`VPL;
+        else if ( ( lineCnt == ( `VDR + `VFP ) - 1 ) && ( pixelCnt == ( `HDR + `HFP + `HSP + `HBP ) - 1 ) )
+            vSync = `VPL;
+        else if ( ( lineCnt == ( `VDR + `VFP + `VSP ) - 1 ) && ( pixelCnt == ( `HDR + `HFP + `HSP + `HBP ) - 1 ) )
+            vSync = ~`VPL;
     end
     
     /*----- Horizontal Blanking Signal Generator ----------------------------*
@@ -109,16 +106,16 @@ module vgaHandler ( clock, reset, hSync, pixelCnt, vSync, lineCnt, compBlank  );
 
     /*----- Horizontal Blanking Signal Generator ----------------------------*
     *   The Vertical blanking singal should be high when it's counter is     *
-    *   exclusively less than ( `VDT ) and must be seted to low after the     *
+    *   exclusively less than ( `VDR ) and must be seted to low after the     *
     *   ( Vretical Total ) time.                                             *
     *------------------------------------------------------------------------*/
 
     always @ ( posedge clock or posedge reset ) begin
         if ( reset )
             vBlank <= 1'b0;
-        else if ( ( lineCnt == `VDT - 1 ) && ( pixelCnt == ( `HDR + `HFP + `HSP + `HBP ) - 1 ) ) /*-Outside Display Region */
+        else if ( ( lineCnt == `VDR - 1 ) && ( pixelCnt == ( `HDR + `HFP + `HSP + `HBP ) - 1 ) ) /*-Outside Display Region */
             vBlank <= 1'b1;
-        else if ( ( lineCnt == ( `VDT + `VFP + `VSP + `VBP ) - 1 ) && ( pixelCnt == ( `HDR + `HFP + `HSP + `HBP ) - 1 ) )
+        else if ( ( lineCnt == ( `VDR + `VFP + `VSP + `VBP ) - 1 ) && ( pixelCnt == ( `HDR + `HFP + `HSP + `HBP ) - 1 ) )
             vBlank <= 1'b0;
     end
 

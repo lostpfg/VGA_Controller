@@ -4,7 +4,7 @@
 *                                                                               *
 *                            |                    |                             *
 *   clock           -------> |                    |                             *
-*   reset           -------> |                    | -------> outBit             *
+*   reset           -------> |                    | -------> outByte            *
 *   highAddrOffset  --/03--> |   romController    |                             *
 *   lowAddrOffset   --/04--> |                    |                             *
 *                            |                    |                             *
@@ -15,6 +15,7 @@
 module  romController ( clock, reset, enable, highAddrOffset, lowAddrOffset, outByte ) ; 
 
   input                   reset;
+  input                   clock;
   input                   enable;
   input          [2:0]    highAddrOffset;
   input          [3:0]    lowAddrOffset;
@@ -23,7 +24,7 @@ module  romController ( clock, reset, enable, highAddrOffset, lowAddrOffset, out
   wire           [7:0]    reqByte;
   output  reg    [7:0]    outByte;
   
-  assign  readEn = ( ~highAddrOffset[2] ) && enable;
+  assign  readEn  = ( ~highAddrOffset[2] ) && enable;
   assign  reqAdrr = { highAddrOffset[1:0], lowAddrOffset };
   
   charRom charByte ( reqAdrr, reqByte );

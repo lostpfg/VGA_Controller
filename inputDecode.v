@@ -96,8 +96,8 @@ module inputDecode ( clock , reset, inCode, userNum, movSpeed, charRGB, bgRGB, c
         movSpeed <= 3'd1;
       else
         case ( inCode )
-          4'hB : movSpeed   <= ( movSpeed == 3'd4 ) ? 3'd0 : movSpeed + 1'b1;
-          4'hC : movSpeed   <= ( movSpeed == 3'd1 ) ? 3'd4 : movSpeed - 1'b1;
+          4'hB : movSpeed   <= ( movSpeed == 3'd4 ) ? 3'd1 : movSpeed + 1'd1;
+          4'hC : movSpeed   <= ( movSpeed == 3'd1 ) ? 3'd4 : movSpeed - 1'd1;
         endcase
   end
 
