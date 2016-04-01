@@ -56,10 +56,10 @@ In the initial state, after the synchronization with the VGA interface the scree
 			|                                         |
 			- - - - - - - - - - - - - - - - - - - - - -
 
-Using the arrow keys character moves on the screen in the corresponding direction by X or Y pixels defined by the character's dimensions(default 16*8). Moving offset (speed) can be adjusted and increased up to 4*X,Y using +,- keys. In the case where the character region reaches the limits of the visible screen, character region is being  folded to the oposite side of the screen.
+Using the arrow keys character moves on the screen in the corresponding direction by X or Y pixels defined by the character's dimensions*(default 16x8)*. Moving offset *(speed)* can be adjusted and increased up to 4xX,Y using +,- keys. In the case where the character region reaches the limits of the visible screen, character region is being  folded to the oposite side of the screen.
 
 ### Colour change
-The color of the active pixels (default white) of a character can be changed by pressing the keys r, g and b. Every press of such a key increases the caracter's respective color (3-bits) component. Furthermore, user has the option to change the color of the background (default black) by pressing the key 'i'. In this case using the above exactly procedure color of the background component can be changed. A press of the key 'i' switches changing color mode back to character's region and vise versa.
+The color of the active pixels *(default white)* of a character can be changed by pressing the keys r, g and b. Every press of such a key increases the caracter's respective color *(3-bits)* component. Furthermore, user has the option to change the color of the background *(default black)* by pressing the key 'i'. In this case using the above exactly procedure color of the background component can be changed. A press of the key 'i' switches changing color mode back to character's region and vise versa.
  
 ### Character flash
 By pressing the key 'f' character starts to flash on the screen with frequency depending on the clock defined on the flashClk module.
