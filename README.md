@@ -38,7 +38,25 @@ The project's structure is expanded below
                 |
                 +--- charRom             
     
-   
+### Character ROM
+
+      '00111000' /*   ###    */
+      '01111000' /*  ####    */
+      '11111000' /* #####    */
+      '10111000' /* ## ##    */
+      '00011000' /*    ##    */
+      '00011000' /*    ##    */
+      '00011000' /*    ##    */
+      '00011000' /*    ##    */
+      '00011000' /*    ##    */
+      '00011000' /*    ##    */
+      '00011000' /*    ##    */
+      '00011000' /*    ##    */
+      '00011000' /*    ##    */
+      '00011000' /*    ##    */
+      '11111111' /* ######## */
+      '11111111' /* ######## */
+
 All characters are stored in the charROM(16x8bit) which contains the pattern of pixels being on the screen whether a particular character needs to be displayed. The bits within the rom indicate which pixels of a 16x8 bit tile should be displayed. By default rom stores pattern for characters 1,2,3 and 4.
 
 ## Functionality 
